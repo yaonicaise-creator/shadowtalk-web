@@ -2392,7 +2392,7 @@ document.querySelectorAll('.screen').forEach(s=>{ s.style.display='none'; s.clas
 document.getElementById('bottom-nav').style.display='none';
 // Restore saved ElevenLabs key
 try { const k = localStorage.getItem('el_api_key'); if(k) elApiKey = k; } catch(_){}
-loadState(); setTimeout(()=>showScreen('splash'),30);
+showScreen('splash');
 </script>
 </div><!-- /#phone-shell -->
 </body>
