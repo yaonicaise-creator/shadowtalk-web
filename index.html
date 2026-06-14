@@ -1,0 +1,2399 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ShadowTalk – Learn English</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════
+   DESIGN TOKENS — DARK (default) + LIGHT
+══════════════════════════════════ */
+:root {
+  --bg: #080808;
+  --surface: #0f0f0f;
+  --card: #161616;
+  --border: rgba(201,168,76,0.15);
+  --border-plain: rgba(255,255,255,0.07);
+  --accent1: #e0314b;
+  --accent2: #2dd4bf;
+  --accent3: #c9a84c;
+  --text: #f0ede8;
+  --text2: #aaa;
+  --muted: #555;
+  --green: #00e676;
+  --orange: #ff9800;
+  --shadow-card: 0 2px 16px rgba(0,0,0,0.4);
+}
+[data-theme="light"] {
+  --bg: #f5f3ee;
+  --surface: #ffffff;
+  --card: #ffffff;
+  --border: rgba(180,140,60,0.2);
+  --border-plain: rgba(0,0,0,0.08);
+  --text: #1a1612;
+  --text2: #555;
+  --muted: #999;
+  --shadow-card: 0 2px 16px rgba(0,0,0,0.1);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+/* ── OUTER STAGE ── */
+html { background:#111; min-height:100%; }
+@media(min-width:520px){
+  html {
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(201,168,76,0.04) 0%, transparent 65%),
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,0.015) 1px, transparent 1px),
+      #0a0a0a;
+    background-size:auto,40px 40px,40px 40px;
+  }
+}
+
+body {
+  background:transparent; color:var(--text); font-family:'Inter',sans-serif;
+  min-height:100vh; overflow-x:hidden;
+  display:flex; align-items:flex-start; justify-content:center; padding:0;
+}
+
+/* ── PHONE SHELL ── */
+#phone-shell {
+  position:relative; width:100%; max-width:420px;
+  min-height:100vh; min-height:100dvh;
+  background:var(--bg); overflow:hidden;
+  transition:background .3s;
+}
+@media(min-width:520px){
+  html{background:#111;}
+  body{ align-items:center; justify-content:center; min-height:100vh; padding:2rem 1rem; }
+  #phone-shell{
+    width:390px; height:844px; min-height:unset;
+    border-radius:48px;
+    box-shadow:0 0 0 1px rgba(255,255,255,0.06),0 0 0 10px #1a1a1a,0 0 0 12px #222,0 0 60px rgba(0,0,0,0.8);
+    overflow:hidden; overflow-y:auto; scroll-behavior:smooth;
+    transform:translateZ(0); contain:layout style;
+  }
+}
+
+/* Noise overlay */
+#phone-shell::after{
+  content:''; position:absolute; inset:0; pointer-events:none; z-index:0; opacity:0.3;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* ── STATUS BAR (desktop only) ── */
+#phone-statusbar{ display:none; }
+@media(min-width:520px){
+  #phone-statusbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0.65rem 1.5rem 0.2rem; font-size:0.7rem; font-weight:600;
+    color:var(--text2); font-family:'Inter',sans-serif;
+    position:sticky; top:0; z-index:100; pointer-events:none;
+    background:transparent;
+  }
+}
+
+/* ── SCREENS ── */
+.screen{ display:none !important; position:relative; z-index:1; }
+.screen.active{ display:block !important; }
+#screen-splash.active{ display:flex !important; flex-direction:column; align-items:center; justify-content:center; }
+
+/* ═══════════════════════════════
+   SCREEN 0 — SPLASH
+═══════════════════════════════ */
+#screen-splash{
+  min-height:100vh; min-height:100dvh;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:2rem 1.5rem;
+  background:radial-gradient(ellipse at 60% 20%, rgba(201,168,76,0.12) 0%, transparent 55%),
+             radial-gradient(ellipse at 20% 85%, rgba(45,212,191,0.06) 0%, transparent 55%),
+             var(--bg);
+}
+.logo-wrap{ margin-bottom:1.75rem; animation:fadeDown 0.7s ease both; }
+.splash-headline{
+  font-family:'Playfair Display',serif; font-size:clamp(1.8rem,5vw,3rem);
+  line-height:1.1; margin-bottom:0.75rem; animation:fadeUp 0.7s 0.2s ease both;
+}
+.splash-headline em{ color:var(--accent3); font-style:normal; }
+.splash-sub{
+  color:var(--text2); font-size:0.92rem; max-width:320px;
+  line-height:1.65; margin-bottom:2rem; animation:fadeUp 0.7s 0.35s ease both;
+}
+.pill-row{
+  display:flex; gap:0.6rem; flex-wrap:wrap; justify-content:center;
+  margin-bottom:2rem; animation:fadeUp 0.7s 0.45s ease both;
+}
+.pill{
+  padding:0.3rem 0.85rem; border-radius:999px; font-size:0.75rem; font-weight:600; border:1px solid;
+}
+.pill.red{ border-color:var(--accent1); color:var(--accent1); background:rgba(224,49,75,0.08); }
+.pill.cyan{ border-color:var(--accent2); color:var(--accent2); background:rgba(45,212,191,0.08); }
+.pill.gold{ border-color:var(--accent3); color:var(--accent3); background:rgba(201,168,76,0.08); }
+
+/* Animated CTA */
+@keyframes btnPulse{
+  0%,100%{ box-shadow:0 0 0 0 rgba(201,168,76,0.5), 0 4px 20px rgba(201,168,76,0.3); transform:scale(1); }
+  50%{ box-shadow:0 0 0 10px rgba(201,168,76,0), 0 4px 30px rgba(201,168,76,0.5); transform:scale(1.02); }
+}
+.btn-cta{
+  padding:1rem 2.5rem; border-radius:14px; border:none; cursor:pointer;
+  font-family:'Inter',sans-serif; font-size:1rem; font-weight:700;
+  background:linear-gradient(135deg,#d4a84c,#7a5010); color:#fff;
+  letter-spacing:0.5px; animation:fadeUp 0.7s 0.55s ease both, btnPulse 2.5s 1.5s infinite;
+}
+.btn-cta:active{ transform:scale(0.97) !important; }
+
+/* mini leaderboard */
+.lb-preview{
+  margin-top:2.5rem; width:100%; max-width:340px;
+  background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden;
+  animation:fadeUp 0.7s 0.7s ease both;
+}
+.lb-preview-head{
+  padding:0.65rem 1rem;
+  background:linear-gradient(90deg,rgba(224,49,75,0.12),transparent);
+  border-bottom:1px solid var(--border);
+  font-size:0.72rem; font-weight:700; letter-spacing:1px; color:var(--accent1);
+}
+.lb-row{ display:flex; align-items:center; gap:0.85rem; padding:0.55rem 1rem; border-bottom:1px solid var(--border); font-size:0.85rem; }
+.lb-row:last-child{ border-bottom:none; }
+.lb-rank{ width:1.3rem; font-family:'JetBrains Mono',monospace; color:var(--muted); font-size:0.75rem; }
+.lb-rank.gold{ color:var(--accent3); font-weight:700; }
+.lb-name{ flex:1; font-weight:500; color:var(--text); }
+.lb-xp{ font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--accent2); }
+.lb-streak{ font-size:0.68rem; color:var(--orange); }
+
+/* ═══════════════════════════════
+   TOP BAR
+═══════════════════════════════ */
+.top-bar{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0.6rem 0.85rem; margin:0.75rem 0.75rem 1.25rem;
+  background:var(--surface); border:1px solid var(--border-plain);
+  border-radius:14px; backdrop-filter:blur(8px);
+  position:sticky; top:0.5rem; z-index:30;
+  box-shadow:0 2px 12px rgba(0,0,0,0.15);
+}
+[data-theme="light"] .top-bar{ box-shadow:0 2px 12px rgba(0,0,0,0.08); }
+.xp-chip{
+  padding:0.25rem 0.65rem; border-radius:999px;
+  background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.2);
+  font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:var(--accent3); font-weight:600;
+}
+.streak-chip{
+  background:rgba(255,152,0,0.12); border:1px solid rgba(255,152,0,0.3);
+  color:var(--orange); padding:0.25rem 0.65rem; border-radius:999px; font-size:0.75rem; font-weight:700;
+}
+.icon-btn{
+  width:30px; height:30px; border-radius:8px; border:1px solid var(--border-plain);
+  background:var(--card); display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:0.85rem; line-height:1;
+}
+
+/* ═══════════════════════════════
+   SCREEN 1 — EPISODES
+═══════════════════════════════ */
+#screen-episodes{ min-height:100vh; padding:0 0 8rem; background:var(--bg); }
+.section-header{ padding:0 1rem 0.25rem; }
+.section-title{ font-family:'Playfair Display',serif; font-size:1.8rem; letter-spacing:1.5px; color:var(--text); }
+.section-sub{ color:var(--muted); font-size:0.82rem; margin-top:0.2rem; }
+.episodes-grid{ display:flex; flex-direction:column; gap:0.85rem; padding:1rem 0.85rem 0; }
+
+/* Episode cards */
+.ep-card{
+  background:var(--card); border:1px solid var(--border-plain);
+  border-radius:16px; overflow:hidden; cursor:pointer;
+  transition:transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  position:relative; box-shadow:var(--shadow-card);
+}
+.ep-card:active:not(.locked){ transform:scale(0.98); }
+.ep-card.locked{ opacity:0.4; cursor:not-allowed; }
+.ep-card.completed{ border-color:rgba(0,230,118,0.25); }
+.ep-card.active-ep{
+  border-color:rgba(201,168,76,0.6);
+  box-shadow:0 0 0 1px rgba(201,168,76,0.2), 0 8px 28px rgba(201,168,76,0.12);
+}
+
+/* Pulse on active card */
+@keyframes cardGlow{
+  0%,100%{ box-shadow:0 0 0 1px rgba(201,168,76,0.2), 0 8px 28px rgba(201,168,76,0.1); }
+  50%{ box-shadow:0 0 0 2px rgba(201,168,76,0.4), 0 8px 36px rgba(201,168,76,0.25); }
+}
+.ep-card.active-ep{ animation:cardGlow 2.5s infinite; }
+
+.ep-genre-bar{ height:3px; }
+.genre-thriller{ background:linear-gradient(90deg,var(--accent1),#ff6b35); }
+.genre-romance{ background:linear-gradient(90deg,#ff69b4,#da70d6); }
+.genre-survival{ background:linear-gradient(90deg,var(--accent3),var(--orange)); }
+
+.ep-inner{ padding:1rem 1rem 0.9rem; display:flex; gap:0.85rem; align-items:center; }
+.ep-emoji{ font-size:2rem; flex-shrink:0; }
+.ep-content{ flex:1; min-width:0; }
+.ep-genre-tag{ font-size:0.62rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-bottom:0.2rem; }
+.tag-thriller{ color:var(--accent1); } .tag-romance{ color:#ff69b4; } .tag-survival{ color:var(--accent3); }
+.ep-title{ font-size:0.95rem; font-weight:700; margin-bottom:0.2rem; color:var(--text); }
+.ep-desc{ font-size:0.78rem; color:var(--text2); line-height:1.45; }
+.ep-meta{ display:flex; align-items:center; gap:0.6rem; margin-top:0.5rem; flex-wrap:wrap; }
+.ep-xp{ font-size:0.7rem; color:var(--accent2); font-family:'JetBrains Mono',monospace; }
+.ep-words{ font-size:0.7rem; color:var(--muted); }
+
+/* Play button inside card */
+.ep-play-btn{
+  flex-shrink:0; width:40px; height:40px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.1rem; border:none; cursor:pointer;
+  background:linear-gradient(135deg,#d4a84c,#7a5010); color:#fff;
+  box-shadow:0 3px 12px rgba(201,168,76,0.3);
+  transition:transform 0.15s;
+}
+.ep-card.active-ep .ep-play-btn{
+  animation:btnPulse 2s infinite;
+}
+.ep-card.locked .ep-play-btn{
+  background:var(--surface); color:var(--muted);
+  box-shadow:none; animation:none;
+}
+.ep-card.completed .ep-play-btn{
+  background:rgba(0,230,118,0.15); color:var(--green);
+  box-shadow:none; animation:none;
+}
+
+/* ═══════════════════════════════
+   SCREEN 2 — PLAYER
+   Full-screen step-by-step, NO SCROLL
+═══════════════════════════════ */
+#screen-player{
+  min-height:100vh; min-height:100dvh;
+  display:flex; flex-direction:column;
+  background:var(--bg); overflow:hidden;
+  padding-bottom:0;
+}
+.player-header{
+  padding:0.5rem 0.85rem 0;
+  flex-shrink:0;
+}
+.progress-track{ display:flex; gap:0.35rem; padding:0.6rem 1rem 0; flex-shrink:0; }
+.progress-step{
+  flex:1; height:3px; border-radius:2px;
+  background:var(--border-plain); transition:background 0.4s;
+}
+.progress-step.done{ background:var(--accent1); }
+.progress-step.current{ background:var(--accent2); }
+
+/* Step panel — fills remaining height */
+.step-panel{
+  flex:1; display:flex; flex-direction:column;
+  padding:0.75rem 0.85rem; overflow:hidden;
+  min-height:0;
+}
+
+/* Each sub-section inside a step */
+.step-section{ display:none; flex-direction:column; flex:1; }
+.step-section.active{ display:flex; animation:fadeUp 0.35s ease; }
+
+/* Scene info section */
+.scene-card-mini{
+  background:var(--card); border:1px solid var(--border-plain);
+  border-radius:16px; overflow:hidden; flex-shrink:0; margin-bottom:0.75rem;
+}
+.scene-loc{
+  padding:0.5rem 0.85rem; font-size:0.65rem; font-weight:700; letter-spacing:1px;
+  color:var(--muted); text-transform:uppercase; font-family:'JetBrains Mono',monospace;
+  border-bottom:1px solid var(--border-plain);
+  background:linear-gradient(90deg,rgba(201,168,76,0.05),transparent);
+  display:flex; align-items:center; gap:0.5rem;
+}
+.scene-ctx{
+  padding:0.75rem 0.85rem; font-size:0.82rem; color:var(--text2); line-height:1.55;
+  font-style:italic;
+}
+
+/* Dialogue */
+.dialogue-block{ display:flex; flex-direction:column; gap:0.75rem; flex:1; overflow-y:auto; padding-bottom:0.5rem; }
+.dlg-line{ display:flex; gap:0.6rem; align-items:flex-end; }
+.dlg-line.you{ flex-direction:row-reverse; }
+.dlg-avatar{
+  width:32px; height:32px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:1rem;
+  background:var(--surface); border:1.5px solid var(--border-plain);
+}
+.dlg-line.you .dlg-avatar{ border-color:var(--accent1); }
+.bubble{
+  max-width:78%; padding:0.6rem 0.85rem; border-radius:14px;
+  font-size:0.88rem; line-height:1.5;
+}
+.bubble.them{
+  background:var(--surface); border:1px solid var(--border-plain);
+  border-radius:4px 14px 14px 14px;
+}
+.bubble.you{
+  background:rgba(224,49,75,0.1); border:1px solid rgba(224,49,75,0.2);
+  border-radius:14px 4px 14px 14px; text-align:right;
+}
+.bubble .spk-name{ font-size:0.62rem; font-weight:700; color:var(--muted); margin-bottom:0.2rem; letter-spacing:0.5px; }
+.bubble.you .spk-name{ color:var(--accent1); }
+.bubble .line-en{ font-weight:400; color:var(--text); }
+.bubble .line-fr{ font-size:0.72rem; color:var(--muted); margin-top:0.2rem; font-style:italic; }
+.word-key{ color:var(--accent2); font-weight:600; cursor:pointer; border-bottom:1px dashed var(--accent2); transition:background 0.15s; border-radius:2px; }
+.word-key:active{ background:rgba(45,212,191,0.15); }
+
+/* Section actions — always at bottom of step panel */
+.section-actions{
+  display:flex; flex-direction:column; gap:0.6rem;
+  flex-shrink:0; padding-top:0.75rem;
+}
+
+/* Shadowing section */
+.shadow-box{
+  background:rgba(45,212,191,0.04); border:1px solid rgba(45,212,191,0.18);
+  border-radius:14px; padding:0.85rem 1rem; flex-shrink:0;
+}
+.shadow-label{ font-size:0.6rem; font-weight:700; letter-spacing:1.5px; color:var(--accent2); text-transform:uppercase; margin-bottom:0.5rem; }
+.shadow-phrase{ font-size:1rem; font-weight:700; margin-bottom:0.3rem; line-height:1.5; color:var(--text); }
+.shadow-phonetic{ font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); margin-bottom:0.75rem; }
+
+/* Mic/listen controls */
+.shadow-controls{ display:flex; gap:0.6rem; }
+@keyframes listenPulse{
+  0%,100%{ box-shadow:0 0 0 0 rgba(45,212,191,0.5), 0 3px 12px rgba(45,212,191,0.3); }
+  50%{ box-shadow:0 0 0 8px rgba(45,212,191,0), 0 3px 18px rgba(45,212,191,0.5); }
+}
+@keyframes recPulse{
+  0%,100%{ box-shadow:0 0 0 0 rgba(224,49,75,0.5); background:var(--accent1); }
+  50%{ box-shadow:0 0 0 8px rgba(224,49,75,0), background:var(--accent1); }
+}
+.btn-listen{
+  flex:1; padding:0.7rem; border-radius:12px; border:none; cursor:pointer;
+  font-size:0.88rem; font-weight:700; font-family:'Inter',sans-serif;
+  background:linear-gradient(135deg,var(--accent2),#0099bb); color:#000;
+  transition:transform 0.15s;
+}
+.btn-listen.pulsing{ animation:listenPulse 2s infinite; }
+.btn-listen:active{ transform:scale(0.97); }
+.btn-record{
+  flex:1; padding:0.7rem; border-radius:12px; cursor:pointer;
+  font-size:0.88rem; font-weight:700; font-family:'Inter',sans-serif;
+  border:2px solid var(--accent1); background:transparent; color:var(--accent1);
+  transition:all 0.15s;
+}
+.btn-record.pulsing{ animation:recPulse 2s infinite; }
+.btn-record.recording{ background:var(--accent1); color:#fff; animation:recPulse 0.8s infinite; }
+.btn-record:disabled{ opacity:0.35; cursor:not-allowed; animation:none; }
+
+/* Transcript + score */
+.transcript-box{
+  margin-top:0.65rem; padding:0.6rem 0.85rem;
+  background:rgba(255,255,255,0.04); border:1px dashed var(--border-plain);
+  border-radius:10px; font-size:0.82rem; color:var(--text2);
+  font-style:italic; display:none;
+}
+[data-theme="light"] .transcript-box{ background:rgba(0,0,0,0.03); }
+.transcript-box.show{ display:block; }
+.transcript-box.listening{ border-color:var(--accent1); color:var(--text); animation:pulse 1.2s infinite; }
+
+.score-card{ display:none; margin-top:0.65rem; border-radius:12px; overflow:hidden; border:1px solid var(--border-plain); }
+.score-card.show{ display:block; animation:fadeUp 0.3s ease; }
+.score-bar-wrap{ padding:0.85rem 1rem 0.5rem; background:var(--surface); }
+.score-row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; }
+.score-label-txt{ font-size:0.68rem; font-weight:700; letter-spacing:1px; color:var(--muted); text-transform:uppercase; }
+.score-num{ font-family:'Playfair Display',serif; font-size:1.8rem; line-height:1; }
+.score-num.excellent{ color:var(--green); }
+.score-num.good{ color:var(--accent2); }
+.score-num.ok{ color:var(--accent3); }
+.score-num.retry{ color:var(--accent1); }
+.score-track{ height:7px; background:var(--border-plain); border-radius:4px; overflow:hidden; }
+.score-fill{ height:100%; border-radius:4px; width:0%; transition:width 0.8s cubic-bezier(0.34,1.56,0.64,1); }
+.score-fill.excellent{ background:linear-gradient(90deg,var(--green),#00c853); }
+.score-fill.good{ background:linear-gradient(90deg,var(--accent2),#0099bb); }
+.score-fill.ok{ background:linear-gradient(90deg,var(--accent3),var(--orange)); }
+.score-fill.retry{ background:linear-gradient(90deg,var(--accent1),#c0175a); }
+.score-feedback{ padding:0.75rem 1rem; background:var(--card); }
+.score-feedback-text{ font-size:0.82rem; line-height:1.55; color:var(--text); }
+.word-diff{ display:flex; flex-wrap:wrap; gap:0.3rem; margin-top:0.5rem; }
+.wd{ padding:0.18rem 0.45rem; border-radius:5px; font-size:0.75rem; font-family:'JetBrains Mono',monospace; }
+.wd.correct{ background:rgba(0,230,118,0.12); color:var(--green); }
+.wd.wrong{ background:rgba(224,49,75,0.12); color:var(--accent1); text-decoration:line-through; }
+.wd.missing{ background:rgba(201,168,76,0.12); color:var(--accent3); font-style:italic; }
+
+.rep-counter{ display:flex; gap:0.4rem; margin-top:0.6rem; align-items:center; }
+.rep-dot{ width:9px; height:9px; border-radius:50%; background:var(--border-plain); transition:background 0.3s; }
+.rep-dot.filled{ background:var(--accent2); }
+.rep-dot.gold{ background:var(--accent3); }
+.rep-label{ font-size:0.68rem; color:var(--muted); margin-left:0.25rem; }
+
+/* Quiz */
+.quiz-box{
+  background:var(--card); border:1px solid var(--border-plain);
+  border-radius:14px; padding:1rem; flex-shrink:0;
+}
+.quiz-label{ font-size:0.6rem; font-weight:700; letter-spacing:1px; color:var(--accent3); text-transform:uppercase; margin-bottom:0.6rem; }
+.quiz-q{ font-size:0.9rem; font-weight:500; margin-bottom:0.85rem; line-height:1.5; color:var(--text); }
+.quiz-options{ display:flex; flex-direction:column; gap:0.45rem; }
+.quiz-opt{
+  padding:0.65rem 0.9rem; border-radius:10px; border:1px solid var(--border-plain);
+  background:var(--surface); cursor:pointer; font-size:0.85rem; text-align:left;
+  color:var(--text); font-family:'Inter',sans-serif; transition:all 0.18s;
+}
+.quiz-opt:active:not(:disabled){ transform:scale(0.99); }
+.quiz-opt.correct{ border-color:var(--green); background:rgba(0,230,118,0.08); color:var(--green); }
+.quiz-opt.wrong{ border-color:var(--accent1); background:rgba(224,49,75,0.08); color:var(--accent1); }
+.quiz-opt:disabled{ cursor:not-allowed; }
+.quiz-feedback{ margin-top:0.6rem; font-size:0.8rem; font-style:italic; display:none; }
+.quiz-feedback.show{ display:block; }
+.feedback-correct{ color:var(--green); }
+.feedback-wrong{ color:var(--accent1); }
+
+/* Cliffhanger */
+.cliff-card{
+  background:linear-gradient(135deg,rgba(224,49,75,0.08),rgba(45,212,191,0.04));
+  border:1px solid rgba(224,49,75,0.25); border-radius:14px;
+  padding:1.25rem; text-align:center; display:none; flex-shrink:0;
+}
+.cliff-card.show{ display:block; animation:fadeUp 0.4s ease; }
+.cliff-icon{ font-size:2.5rem; margin-bottom:0.6rem; }
+.cliff-label{ font-size:0.62rem; font-weight:700; letter-spacing:2px; color:var(--accent1); text-transform:uppercase; margin-bottom:0.4rem; }
+.cliff-text{ font-size:0.92rem; font-weight:600; line-height:1.5; margin-bottom:0.75rem; color:var(--text); }
+.cliff-sub{ font-size:0.75rem; color:var(--muted); }
+
+/* ── STICKY ACTION BAR ── */
+.sticky-bar{
+  position:fixed; bottom:60px; left:0; right:0;
+  padding:0.65rem 1rem;
+  background:linear-gradient(to top, var(--bg) 55%, transparent);
+  z-index:40; display:none; pointer-events:none;
+}
+@media(min-width:520px){ .sticky-bar{ max-width:390px; left:50%; transform:translateX(-50%); } }
+.sticky-bar.show{ display:block; pointer-events:auto; }
+
+/* The primary action button */
+@keyframes actionPulse{
+  0%,100%{ box-shadow:0 0 0 0 rgba(201,168,76,0.5), 0 4px 20px rgba(201,168,76,0.3); }
+  50%{ box-shadow:0 0 0 10px rgba(201,168,76,0), 0 4px 30px rgba(201,168,76,0.5); }
+}
+.btn-action{
+  width:100%; padding:0.95rem 1.5rem; border-radius:14px; border:none; cursor:pointer;
+  font-family:'Inter',sans-serif; font-size:0.95rem; font-weight:700;
+  background:linear-gradient(135deg,#d4a84c,#7a5010); color:#fff;
+  letter-spacing:0.4px; display:block;
+  box-shadow:0 4px 20px rgba(201,168,76,0.3);
+  transition:transform 0.15s, box-shadow 0.15s;
+}
+.btn-action.pulsing{ animation:actionPulse 2s infinite; }
+.btn-action:active{ transform:scale(0.98) !important; }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{
+  position:fixed; bottom:0; left:0; right:0;
+  background:rgba(15,15,15,0.96); border-top:1px solid rgba(201,168,76,0.1);
+  display:flex; z-index:50; backdrop-filter:blur(16px);
+  padding-bottom:env(safe-area-inset-bottom,0);
+}
+@media(min-width:520px){ .bottom-nav{ max-width:390px; left:50%; transform:translateX(-50%); } }
+[data-theme="light"] .bottom-nav{ background:rgba(245,243,238,0.96); border-top:1px solid rgba(0,0,0,0.08); }
+.nav-btn{
+  flex:1; padding:0.7rem; border:none; background:transparent;
+  color:var(--muted); cursor:pointer; font-size:0.65rem;
+  display:flex; flex-direction:column; align-items:center; gap:0.18rem;
+  transition:color 0.2s; font-family:'Inter',sans-serif; font-weight:600;
+}
+.nav-btn .nav-icon{ font-size:1.15rem; }
+.nav-btn.active{ color:var(--accent3); }
+.nav-btn:active{ opacity:0.7; }
+
+/* ── LEADERBOARD ── */
+#screen-leaderboard{ min-height:100vh; padding:0 0 8rem; background:var(--bg); }
+.lb-wrap{ padding:0 0.85rem; }
+.lb-big-header{ text-align:center; padding:1rem 0 1.5rem; }
+.lb-big-header h1{ font-family:'Playfair Display',serif; font-size:2rem; letter-spacing:2px; }
+.lb-big-header p{ color:var(--muted); font-size:0.82rem; margin-top:0.2rem; }
+.my-rank-card{
+  background:linear-gradient(135deg,rgba(224,49,75,0.1),rgba(45,212,191,0.04));
+  border:1px solid rgba(224,49,75,0.25); border-radius:14px;
+  padding:1rem; margin-bottom:1.25rem;
+  display:flex; align-items:center; gap:0.85rem;
+}
+.my-rank-num{ font-family:'Playfair Display',serif; font-size:2.6rem; color:var(--accent1); line-height:1; }
+.my-rank-info{ flex:1; }
+.my-rank-label{ font-size:0.68rem; color:var(--muted); letter-spacing:1px; text-transform:uppercase; }
+.my-rank-name{ font-weight:700; font-size:1rem; color:var(--text); }
+.my-rank-xp{ font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--accent2); }
+.my-rank-streak{ font-size:0.78rem; color:var(--orange); }
+.lb-full-list{ display:flex; flex-direction:column; gap:0.45rem; }
+.lb-item{
+  background:var(--card); border:1px solid var(--border-plain);
+  border-radius:12px; padding:0.75rem 1rem;
+  display:flex; align-items:center; gap:0.85rem;
+}
+.lb-item.me{ border-color:rgba(224,49,75,0.35); background:rgba(224,49,75,0.04); }
+.lb-item-rank{ font-family:'JetBrains Mono',monospace; width:1.8rem; font-size:0.8rem; color:var(--muted); text-align:center; }
+.lb-item-rank.top1{ color:#ffd700; font-weight:700; }
+.lb-item-rank.top2{ color:#c0c0c0; font-weight:700; }
+.lb-item-rank.top3{ color:#cd7f32; font-weight:700; }
+.lb-item-avatar{ width:34px; height:34px; border-radius:50%; font-size:1.1rem; display:flex; align-items:center; justify-content:center; background:var(--surface); }
+.lb-item-name{ flex:1; font-weight:500; font-size:0.88rem; color:var(--text); }
+.lb-item-right{ text-align:right; }
+.lb-item-xp{ font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--accent2); }
+.lb-item-streak{ font-size:0.7rem; color:var(--orange); }
+.challenge-card{
+  background:var(--card); border:1px solid var(--accent3);
+  border-radius:14px; padding:1rem; margin-top:1.25rem;
+}
+.ch-title{ font-size:0.68rem; font-weight:700; letter-spacing:1px; color:var(--accent3); text-transform:uppercase; margin-bottom:0.65rem; }
+.ch-item{ display:flex; align-items:center; gap:0.65rem; padding:0.45rem 0; border-bottom:1px solid var(--border-plain); font-size:0.85rem; color:var(--text); }
+.ch-item:last-child{ border-bottom:none; }
+.ch-reward{ font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:var(--accent3); font-weight:700; margin-left:auto; }
+
+/* ── TOOLTIP ── */
+.tooltip{
+  position:fixed; z-index:200; background:var(--surface); border:1px solid var(--accent2);
+  border-radius:10px; padding:0.65rem 0.9rem; font-size:0.82rem; max-width:200px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.4); display:none; pointer-events:none;
+}
+.tooltip.show{ display:block; animation:fadeIn 0.2s ease; }
+.tt-word{ font-weight:700; color:var(--accent2); margin-bottom:0.2rem; }
+.tt-pron{ font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); }
+.tt-def{ color:var(--text); margin-top:0.2rem; font-size:0.8rem; }
+
+/* ── BANNER / XP POPUP ── */
+.banner{
+  position:fixed; top:1rem; left:50%; transform:translateX(-50%);
+  z-index:300; border-radius:12px; padding:0.75rem 1.1rem;
+  font-size:0.82rem; font-weight:600; max-width:300px; text-align:center;
+  box-shadow:0 4px 16px rgba(0,0,0,0.35); display:none;
+}
+.banner.show{ display:block; animation:fadeDown 0.4s ease; }
+.banner.orange{ background:rgba(255,152,0,0.96); color:#000; }
+.banner.red{ background:rgba(224,49,75,0.96); color:#fff; }
+.banner.green{ background:rgba(0,230,118,0.96); color:#000; }
+.xp-popup{
+  position:fixed; top:1.5rem; right:1rem;
+  background:linear-gradient(135deg,var(--accent3),var(--orange));
+  color:#000; padding:0.6rem 1rem; border-radius:10px;
+  font-weight:700; font-size:0.9rem; display:none; z-index:100;
+  box-shadow:0 3px 14px rgba(255,152,0,0.4); animation:slideIn 0.35s ease;
+}
+.xp-popup.show{ display:block; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{ from{ opacity:0; transform:translateY(18px); } to{ opacity:1; transform:translateY(0); } }
+@keyframes fadeDown{ from{ opacity:0; transform:translateY(-18px); } to{ opacity:1; transform:translateY(0); } }
+@keyframes fadeIn{ from{ opacity:0; } to{ opacity:1; } }
+@keyframes slideIn{ from{ opacity:0; transform:translateX(24px); } to{ opacity:1; transform:translateX(0); } }
+@keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:0.55; } }
+@keyframes slideUp{ from{ opacity:0; transform:translateY(28px); } to{ opacity:1; transform:translateY(0); } }
+
+/* ── TOGGLE ── */
+.toggle-track{ width:42px; height:23px; border-radius:12px; background:#1a1a1a; position:relative; transition:background .2s; flex-shrink:0; border:1px solid var(--border-plain); }
+.toggle-track.on{ background:var(--accent3); }
+.toggle-thumb{ width:17px; height:17px; border-radius:50%; background:#fff; position:absolute; top:2px; left:2px; transition:transform .2s; box-shadow:0 1px 4px rgba(0,0,0,.4); }
+.toggle-track.on .toggle-thumb{ transform:translateX(19px); }
+
+/* ── VOICE GRID ── */
+.voice-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0.55rem; }
+.voice-card{
+  padding:0.7rem 0.85rem; border-radius:12px; cursor:pointer;
+  border:1.5px solid var(--border-plain); background:var(--surface);
+  transition:all 0.18s; position:relative;
+}
+.voice-card.selected{ border-color:var(--accent3); background:rgba(201,168,76,0.07); }
+.voice-card-flag{ font-size:1.2rem; margin-bottom:0.25rem; }
+.voice-card-name{ font-weight:700; font-size:0.8rem; color:var(--text); }
+.voice-card-accent{ font-size:0.66rem; color:var(--muted); margin-top:0.08rem; }
+.voice-card-gender{ font-size:0.58rem; font-weight:700; letter-spacing:0.8px; text-transform:uppercase; margin-top:0.3rem; color:var(--muted); }
+.voice-card.selected .voice-card-name{ color:var(--accent3); }
+.voice-card-check{ position:absolute; top:0.45rem; right:0.55rem; font-size:0.65rem; opacity:0; transition:opacity 0.15s; color:var(--accent3); }
+.voice-card.selected .voice-card-check{ opacity:1; }
+
+/* Settings section labels */
+.settings-label{ font-size:0.56rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--accent3); margin-bottom:0.6rem; }
+.settings-divider{ height:1px; background:var(--border-plain); margin:1.2rem 0; }
+
+/* ── EPISODE HEADER in player ── */
+.ep-header-mini{
+  display:flex; align-items:center; gap:0.6rem;
+  padding:0 0 0.6rem; flex-shrink:0;
+}
+.ep-header-pill{
+  display:inline-flex; padding:0.2rem 0.6rem; border-radius:999px;
+  font-size:0.62rem; font-weight:700; letter-spacing:0.8px;
+}
+.pill-survival{ background:rgba(201,168,76,0.12); color:var(--accent3); border:1px solid rgba(201,168,76,0.25); }
+.pill-thriller{ background:rgba(224,49,75,0.12); color:var(--accent1); border:1px solid rgba(224,49,75,0.25); }
+.pill-romance{ background:rgba(255,105,180,0.12); color:#ff69b4; border:1px solid rgba(255,105,180,0.25); }
+.ep-header-title{ font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; color:var(--text); }
+
+/* Read/Skip dual button */
+.dual-btns{ display:flex; gap:0.6rem; }
+.btn-secondary{
+  flex:1; padding:0.85rem; border-radius:12px; cursor:pointer;
+  font-family:'Inter',sans-serif; font-size:0.88rem; font-weight:600;
+  background:var(--surface); border:1px solid var(--border-plain); color:var(--text2);
+  transition:all 0.15s;
+}
+.btn-secondary:active{ transform:scale(0.98); }
+.btn-action-full{
+  flex:1.4; padding:0.85rem; border-radius:12px; border:none; cursor:pointer;
+  font-family:'Inter',sans-serif; font-size:0.88rem; font-weight:700;
+  background:linear-gradient(135deg,#d4a84c,#7a5010); color:#fff;
+  box-shadow:0 3px 14px rgba(201,168,76,0.3);
+}
+.btn-action-full.pulsing{ animation:actionPulse 2s infinite; }
+.btn-action-full:active{ transform:scale(0.98); }
+
+/* Retry btn inside score */
+.retry-btn{
+  width:100%; margin-top:0.6rem; padding:0.55rem;
+  border-radius:10px; border:1px solid var(--accent1);
+  background:transparent; color:var(--accent1); cursor:pointer;
+  font-size:0.82rem; font-weight:600; font-family:'Inter',sans-serif;
+}
+</style>
+</head>
+<body>
+<div id="phone-shell">
+
+<!-- Status bar (desktop) -->
+<div id="phone-statusbar">
+  <span id="phone-statusbar-time">9:41</span>
+  <div style="display:flex;align-items:center;gap:0.3rem;opacity:0.65;">
+    <svg width="15" height="10" viewBox="0 0 15 10" fill="currentColor"><rect x="0" y="3.5" width="2.5" height="6.5" rx="0.8" opacity="0.4"/><rect x="4" y="2" width="2.5" height="8" rx="0.8" opacity="0.6"/><rect x="8" y="0.5" width="2.5" height="9.5" rx="0.8"/><rect x="12.5" y="0" width="2.5" height="10" rx="0.8" opacity="0.3"/></svg>
+    <svg width="15" height="11" viewBox="0 0 15 11" fill="currentColor"><path d="M7.5 2.5C9.8 2.5 11.8 3.5 13.2 5.1L14.5 3.7C12.7 1.7 10.2 0.5 7.5 0.5C4.8 0.5 2.3 1.7 0.5 3.7L1.8 5.1C3.2 3.5 5.2 2.5 7.5 2.5Z" opacity="0.4"/><path d="M7.5 5.5C9 5.5 10.4 6.1 11.4 7.1L12.7 5.7C11.3 4.3 9.5 3.5 7.5 3.5C5.5 3.5 3.7 4.3 2.3 5.7L3.6 7.1C4.6 6.1 6 5.5 7.5 5.5Z" opacity="0.7"/><circle cx="7.5" cy="9.5" r="1.5"/></svg>
+    <svg width="24" height="11" viewBox="0 0 24 11" fill="none"><rect x="0.5" y="0.5" width="20" height="10" rx="3" stroke="currentColor" stroke-opacity="0.4"/><rect x="1.5" y="1.5" width="16" height="8" rx="2" fill="currentColor"/><path d="M22 3.5v4a2 2 0 000-4z" fill="currentColor" opacity="0.5"/></svg>
+  </div>
+</div>
+
+<!-- Floating elements -->
+<div class="banner" id="banner"></div>
+<div class="tooltip" id="tooltip"><div class="tt-word" id="tt-word"></div><div class="tt-pron" id="tt-pron"></div><div class="tt-def" id="tt-def"></div></div>
+<div class="xp-popup" id="xp-popup">+50 XP 🔥</div>
+
+<!-- ════════════════════════════
+     SCREEN 0 — SPLASH
+════════════════════════════ -->
+
+<!-- ════ ONBOARDING ════ -->
+<div id="screen-onboarding" class="screen" style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;background:radial-gradient(ellipse 80% 50% at 50% -5%, rgba(201,168,76,.18) 0%, transparent 60%), #080808;">
+  <div style="text-align:center;margin-bottom:2rem;">
+    <div style="width:70px;height:70px;border-radius:20px;background:linear-gradient(135deg,#c9a84c,#7a5c1e);display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 1rem;box-shadow:0 0 50px rgba(201,168,76,.35);">🎙️</div>
+    <div style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;background:linear-gradient(135deg,#e8c97e,#c9a84c,#f5e6b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">ShadowTalk</div>
+  </div>
+
+  <div style="width:100%;max-width:340px;">
+    <div style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;margin-bottom:.3rem;text-align:center;">Crée ton profil</div>
+    <div style="font-size:.82rem;color:#666;text-align:center;margin-bottom:1.75rem;">Pour apparaître dans le classement mondial</div>
+
+    <!-- Avatar picker -->
+    <div style="font-size:.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#c9a84c;margin-bottom:.65rem;">Choisis ton avatar</div>
+    <div id="avatar-grid" style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.25rem;"></div>
+
+    <!-- Name input -->
+    <div style="font-size:.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#c9a84c;margin-bottom:.5rem;">Ton pseudo</div>
+    <input id="player-name-input" type="text" maxlength="20" placeholder="Ex: Alex, Fatou, Carlos..." 
+      style="width:100%;padding:.75rem 1rem;border-radius:12px;border:1px solid rgba(201,168,76,.25);background:#0f0f0f;color:#f0ede8;font-size:1rem;font-family:'Inter',sans-serif;margin-bottom:.5rem;outline:none;"
+      oninput="checkOnboardingReady()"
+    />
+    <div id="name-error" style="font-size:.75rem;color:#e0314b;margin-bottom:.9rem;display:none;">Minimum 2 caractères</div>
+
+    <!-- Flag picker -->
+    <div style="font-size:.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#c9a84c;margin-bottom:.65rem;">Ton pays</div>
+    <div id="flag-grid" style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.5rem;"></div>
+
+    <button id="btn-start-game" onclick="completeOnboarding()" disabled
+      style="width:100%;padding:.95rem;border-radius:13px;border:none;cursor:not-allowed;font-family:'Inter',sans-serif;font-size:1rem;font-weight:700;background:#222;color:#555;transition:all .3s;opacity:.5;">
+      C'est parti 🚀
+    </button>
+  </div>
+</div>
+
+<div id="screen-splash" class="screen active">
+  <div class="logo-wrap">
+    <div style="width:68px;height:68px;border-radius:20px;background:linear-gradient(135deg,#c9a84c,#7a5c1e);display:flex;align-items:center;justify-content:center;font-size:1.9rem;margin:0 auto 0.85rem;box-shadow:0 0 40px rgba(201,168,76,0.4);">🎙️</div>
+    <div style="font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:900;color:var(--accent3);line-height:1;letter-spacing:-0.5px;">ShadowTalk</div>
+    <div style="font-size:0.65rem;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-top:0.35rem;">Speak English · Live the story</div>
+  </div>
+  <div class="splash-headline">Learn English through<br><em>stories that hook you.</em></div>
+  <div class="splash-sub">Shadowing + dialogues émotionnels + compétition réelle. 15 min par jour suffisent.</div>
+  <div class="pill-row">
+    <div class="pill red">🔪 Thriller</div>
+    <div class="pill cyan">💬 Survie</div>
+    <div class="pill gold">💕 Romance</div>
+  </div>
+  <button class="btn-cta" onclick="showScreen('episodes')">▶ COMMENCER L'AVENTURE</button>
+  <div class="lb-preview">
+    <div class="lb-preview-head">🏆 CLASSEMENT GLOBAL EN DIRECT</div>
+    <div class="lb-row"><div class="lb-rank gold">1</div><div>🇧🇷</div><div class="lb-name">Carlos M.</div><div class="lb-xp">4 820 XP</div><div class="lb-streak">🔥21j</div></div>
+    <div class="lb-row"><div class="lb-rank">2</div><div>🇲🇦</div><div class="lb-name">Yasmine K.</div><div class="lb-xp">4 310 XP</div><div class="lb-streak">🔥18j</div></div>
+    <div class="lb-row"><div class="lb-rank">3</div><div>🇨🇮</div><div class="lb-name">Kofi A.</div><div class="lb-xp">3 990 XP</div><div class="lb-streak">🔥14j</div></div>
+    <div class="lb-row" style="background:rgba(224,49,75,0.04)"><div class="lb-rank" style="color:var(--accent1)">—</div><div>👤</div><div class="lb-name" style="color:var(--accent1)">Toi (pas encore classé)</div><div class="lb-xp">0 XP</div></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════
+     SCREEN 1 — EPISODES
+════════════════════════════ -->
+<div id="screen-episodes" class="screen">
+  <div class="top-bar">
+    <span style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--accent3);">ShadowTalk</span>
+    <div style="display:flex;align-items:center;gap:0.45rem;">
+      <div class="xp-chip">⚡ <span id="ep-xp-val">0</span></div>
+      <div class="streak-chip" id="ep-streak">🔥 0j</div>
+      <div class="icon-btn" onclick="openSettings()" title="Paramètres">⚙️</div>
+    </div>
+  </div>
+  <div class="section-header">
+    <div class="section-title">SAISON 1</div>
+    <div class="section-sub">New York City · 7 épisodes · 3 univers · 1 histoire</div>
+  </div>
+  <div class="episodes-grid" id="episodes-list"></div>
+</div>
+
+<!-- ════════════════════════════
+     SCREEN 2 — PLAYER
+════════════════════════════ -->
+<div id="screen-player" class="screen">
+  <div class="player-header">
+    <div class="top-bar" style="margin:0.75rem 0 0;">
+      <button onclick="showScreen('episodes')" style="background:transparent;border:1px solid var(--border-plain);color:var(--text2);padding:0.3rem 0.7rem;border-radius:8px;cursor:pointer;font-size:0.78rem;font-family:'Inter',sans-serif;">← Épisodes</button>
+      <div style="display:flex;align-items:center;gap:0.45rem;">
+        <div class="xp-chip">⚡ <span id="pl-xp-val">0</span></div>
+        <div class="streak-chip" id="pl-streak">🔥 0j</div>
+        <div class="icon-btn" onclick="openSettings()">⚙️</div>
+      </div>
+    </div>
+  </div>
+  <div class="progress-track" id="progress-track"></div>
+  <div class="step-panel" id="step-panel">
+    <!-- injected dynamically -->
+  </div>
+</div>
+
+<!-- ════════════════════════════
+     SCREEN 3 — LEADERBOARD
+════════════════════════════ -->
+<div id="screen-leaderboard" class="screen">
+  <div class="top-bar">
+    <span style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--accent3);">Classement</span>
+    <div style="display:flex;align-items:center;gap:0.45rem;">
+      <div class="xp-chip">⚡ <span id="lb-xp-val">0</span></div>
+      <div class="streak-chip" id="lb-streak">🔥 0j</div>
+    </div>
+  </div>
+  <div class="lb-wrap">
+    <div class="lb-big-header"><h1>🏆 CLASSEMENT</h1><p>Semaine en cours · Reset chaque lundi</p></div>
+    <div class="my-rank-card" id="my-rank-card">
+      <div class="my-rank-num" id="my-rank-num">—</div>
+      <div class="my-rank-info">
+        <div class="my-rank-label">TON RANG</div>
+        <div class="my-rank-name" id="my-rank-name">Toi</div>
+        <div class="my-rank-xp" id="my-rank-xp">0 XP</div>
+      </div>
+      <div class="my-rank-streak" id="my-rank-streak">🔥 0 jours</div>
+    </div>
+    <div class="lb-full-list" id="lb-full-list"></div>
+    <div class="challenge-card">
+      <div class="ch-title">⚡ DÉFIS DU JOUR</div>
+      <div class="ch-item">🎙️ <span>Répéter 3 phrases sans hésiter</span><span class="ch-reward">+100 XP</span></div>
+      <div class="ch-item">🔥 <span>Maintenir ton streak aujourd'hui</span><span class="ch-reward">+50 XP</span></div>
+      <div class="ch-item">⚔️ <span>Dépasser Yasmine K. au classement</span><span class="ch-reward">+200 XP</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── STICKY ACTION BAR ── -->
+<div class="sticky-bar" id="sticky-bar">
+  <button class="btn-action pulsing" id="btn-action" onclick="handleAction()">CONTINUER →</button>
+</div>
+
+<!-- ── BOTTOM NAV ── -->
+<div class="bottom-nav" id="bottom-nav" style="display:none">
+  <button class="nav-btn active" id="nav-home" onclick="showScreen('episodes')"><span class="nav-icon">📚</span>Épisodes</button>
+  <button class="nav-btn" id="nav-lb" onclick="showScreen('leaderboard')"><span class="nav-icon">🏆</span>Classement</button>
+</div>
+
+<!-- ── SETTINGS MODAL ── -->
+<div id="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:600;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px);" onclick="if(event.target===this)closeSettings()">
+  <div style="width:100%;max-width:420px;background:var(--card);border-radius:22px 22px 0 0;border:1px solid var(--border-plain);border-bottom:none;padding:1.25rem 1.25rem 2.5rem;max-height:88vh;overflow-y:auto;animation:slideUp .3s cubic-bezier(.16,1,.3,1) both;">
+    <div style="width:32px;height:3px;background:var(--border-plain);border-radius:2px;margin:0 auto 1.2rem;"></div>
+    <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;margin-bottom:1.25rem;color:var(--text);">⚙️ Paramètres</div>
+
+    <!-- Thème -->
+    <div class="settings-label">🌓 Thème</div>
+    <div onclick="toggleTheme()" style="display:flex;align-items:center;gap:0.85rem;padding:0.75rem 0.9rem;border-radius:12px;border:1px solid var(--border-plain);background:var(--surface);cursor:pointer;margin-bottom:0.75rem;">
+      <div style="flex:1;"><div style="font-weight:600;font-size:0.88rem;color:var(--text);">Mode clair</div><div style="font-size:0.7rem;color:var(--muted);margin-top:0.1rem;">Bascule entre sombre et clair</div></div>
+      <div class="toggle-track" id="theme-track"><div class="toggle-thumb"></div></div>
+    </div>
+    <div class="settings-divider"></div>
+
+    <!-- Clé ElevenLabs -->
+    <div class="settings-label">🔑 Clé API ElevenLabs <span style="font-weight:400;color:var(--muted);letter-spacing:0;">(voix professionnelles)</span></div>
+    <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.7rem;line-height:1.55;">
+      Sans clé : voix navigateur (qualité variable).<br>
+      Avec clé : Rachel 🇺🇸♀ · Adam 🇺🇸♂ · Charlotte 🇬🇧♀ · Daniel 🇬🇧♂ — voix humaines réelles.
+      <a href="https://elevenlabs.io" target="_blank" style="color:var(--accent2);text-decoration:none;"> → elevenlabs.io (gratuit 10k chars/mois)</a>
+    </div>
+    <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;">
+      <input id="el-api-key" type="password" placeholder="sk_xxxxxxxxxxxxxxxxxxxxxxxx"
+        style="flex:1;padding:0.6rem 0.85rem;border-radius:10px;border:1px solid var(--border-plain);
+               background:var(--bg);color:var(--text);font-size:0.82rem;font-family:'JetBrains Mono',monospace;"
+        oninput="updateElKeyStatus()" />
+      <button onclick="saveElKey()"
+        style="padding:0.6rem 0.9rem;border-radius:10px;border:none;
+               background:linear-gradient(135deg,#c9a84c,#7a5c1e);color:#0a0600;
+               font-weight:700;font-size:0.78rem;cursor:pointer;white-space:nowrap;">
+        Sauvegarder
+      </button>
+    </div>
+    <div id="el-key-status" style="font-size:0.7rem;margin-bottom:0.75rem;display:none;"></div>
+    <div class="settings-divider"></div>
+
+    <!-- Voix -->
+    <div class="settings-label">🎙 Voix du coach</div>
+    <div id="voice-grid" class="voice-grid" style="margin-bottom:0.75rem;"></div>
+    <div id="voice-info" style="display:none;"></div>
+    <div class="settings-divider"></div>
+
+    <!-- Rappels -->
+    <div class="settings-label">🔔 Rappels quotidiens</div>
+    <div onclick="toggleNotif()" style="display:flex;align-items:center;gap:0.85rem;padding:0.75rem 0.9rem;border-radius:12px;border:1px solid var(--border-plain);background:var(--surface);cursor:pointer;margin-bottom:0.55rem;">
+      <div style="flex:1;"><div style="font-weight:600;font-size:0.88rem;color:var(--text);">Activer les rappels</div><div style="font-size:0.7rem;color:var(--muted);margin-top:0.1rem;">Notification chaque jour à l'heure choisie</div></div>
+      <div class="toggle-track" id="notif-track"><div class="toggle-thumb"></div></div>
+    </div>
+    <div id="time-picker" style="display:none;padding:0.8rem 0.9rem;background:var(--surface);border-radius:12px;border:1px solid var(--border-plain);margin-bottom:0.85rem;">
+      <div style="font-size:0.68rem;color:var(--muted);margin-bottom:0.5rem;">Heure de rappel :</div>
+      <div style="display:flex;gap:0.6rem;align-items:center;">
+        <input id="notif-time" type="time" value="08:00" style="flex:1;padding:0.55rem 0.8rem;border-radius:9px;border:1px solid var(--border-plain);background:var(--bg);color:var(--text);font-size:0.95rem;font-family:'JetBrains Mono',monospace;text-align:center;"/>
+        <button onclick="saveAlertTime()" style="padding:0.55rem 0.9rem;border-radius:9px;border:none;background:linear-gradient(135deg,#c9a84c,#7a5c1e);color:#0a0600;font-weight:700;font-size:0.78rem;cursor:pointer;white-space:nowrap;">Sauvegarder</button>
+      </div>
+      <div id="notif-status" style="font-size:0.7rem;margin-top:0.5rem;display:none;"></div>
+    </div>
+
+    
+      <!-- Reset -->
+      <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.06);">
+        <div style="font-size:.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#555;margin-bottom:.65rem;">PROFIL</div>
+        <div style="font-size:.82rem;color:#666;margin-bottom:.65rem;">
+          Connecté en tant que : <strong id="settings-player-name" style="color:#c9a84c;">—</strong> <span id="settings-player-avatar"></span>
+        </div>
+        <button onclick="resetProfile()" style="padding:.5rem 1rem;border-radius:9px;border:1px solid rgba(224,49,75,.3);background:transparent;color:#e0314b;font-size:.78rem;cursor:pointer;font-family:'Inter',sans-serif;">
+          Changer de profil
+        </button>
+      </div>
+    <button onclick="closeSettings()" style="width:100%;padding:0.85rem;border-radius:12px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:0.9rem;font-weight:700;background:linear-gradient(135deg,#c9a84c,#7a5c1e);color:#0a0600;letter-spacing:0.3px;">✓ Fermer</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════
+// STATE
+// ══════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════
+// FIREBASE — Real-time leaderboard & user persistence
+// ═══════════════════════════════════════════════════════════════
+// Using Firebase REST API (no SDK needed — works in plain HTML)
+// ── FIREBASE SETUP ────────────────────────────────────────────
+// Pour activer le classement en temps réel :
+// 1. Va sur console.firebase.google.com
+// 2. Crée un projet → Realtime Database → Mode test (30 jours)
+// 3. Copie ton URL (ex: https://TON-PROJET-default-rtdb.firebaseio.com)
+// 4. Remplace FB_URL ci-dessous
+const FB_URL = 'https://shadowtalk-live-default-rtdb.firebaseio.com';
+const FB_KEY = ''; // laisser vide pour Realtime Database en mode test
+
+let fbUserId = null;
+let fbPlayerData = { name:'', avatar:'🎙️', flag:'🇫🇷', xp:0, streak:1 };
+
+// ── Generate or retrieve a unique user ID ──────────────────────
+function getFbUserId() {
+  let uid = localStorage.getItem('fb_uid');
+  if (!uid) {
+    uid = 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+    localStorage.setItem('fb_uid', uid);
+  }
+  return uid;
+}
+
+// ── Push player data to Firebase ──────────────────────────────
+async function fbSavePlayer() {
+  if (!fbUserId) return;
+  try {
+    await fetch(`${FB_URL}/players/${fbUserId}.json`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name:    fbPlayerData.name,
+        avatar:  fbPlayerData.avatar,
+        flag:    fbPlayerData.flag,
+        xp:      state.xp,
+        streak:  state.streak,
+        updated: Date.now(),
+      })
+    });
+  } catch(e) { /* offline — localStorage fallback active */ }
+}
+
+// ── Fetch top 20 players ───────────────────────────────────────
+async function fbFetchLeaderboard() {
+  try {
+    const res = await fetch(
+      `${FB_URL}/players.json?orderBy=\"xp\"&limitToLast=20&print=pretty`
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!data) return null;
+
+    // Convert to array, sort desc
+    const players = Object.entries(data)
+      .map(([uid, p]) => ({ uid, ...p }))
+      .sort((a,b) => (b.xp||0) - (a.xp||0));
+
+    return players;
+  } catch(e) { return null; }
+}
+
+// ── Merge Firebase leaderboard with local data ─────────────────
+async function renderLeaderboardLive() {
+  // Show loading state
+  const list = document.getElementById('lb-full-list');
+  if (list) list.innerHTML = '<div style="text-align:center;padding:1.5rem;color:#555;font-size:.85rem;">Chargement du classement…</div>';
+
+  // Always update our own score first
+  await fbSavePlayer();
+
+  const fbData = await fbFetchLeaderboard();
+
+  if (fbData && fbData.length > 0) {
+    renderFirebaseLeaderboard(fbData);
+  } else {
+    // Fallback to local mock leaderboard
+    renderLeaderboard();
+  }
+}
+
+function renderFirebaseLeaderboard(players) {
+  // Sort and rank
+  players.sort((a,b) => (b.xp||0) - (a.xp||0));
+
+  // Find my position
+  const myPos = players.findIndex(p => p.uid === fbUserId);
+  const myData = myPos >= 0 ? players[myPos] : null;
+
+  // Update my rank card
+  const rankNum = document.getElementById('my-rank-num');
+  const rankXp  = document.getElementById('my-rank-xp');
+  const rankStr = document.getElementById('my-rank-streak');
+  if (rankNum) rankNum.textContent = myPos >= 0 ? '#' + (myPos+1) : '—';
+  if (rankXp)  rankXp.textContent  = state.xp + ' XP';
+  if (rankStr) rankStr.textContent = '🔥 ' + state.streak + ' jours';
+
+  // Render list
+  const list = document.getElementById('lb-full-list');
+  if (!list) return;
+  list.innerHTML = '';
+
+  players.slice(0,15).forEach((p, i) => {
+    const isMe = p.uid === fbUserId;
+    const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
+    const rkCls = i===0?'top1':i===1?'top2':i===2?'top3':'';
+    const div = document.createElement('div');
+    div.className = 'lb-item' + (isMe ? ' me' : '');
+    div.innerHTML = `
+      <div class="lb-item-rank ${rkCls}">${medal}</div>
+      <div class="lb-item-avatar">${p.avatar||'🎙️'} ${p.flag||''}</div>
+      <div class="lb-item-name">${p.name||'Anonyme'}${isMe?' <span style="color:#c9a84c;font-size:.7rem">(toi)</span>':''}</div>
+      <div style="text-align:right">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:#2dd4bf">${(p.xp||0).toLocaleString()} XP</div>
+        <div style="font-size:.7rem;color:#f97316">🔥${p.streak||1}j</div>
+      </div>`;
+    list.appendChild(div);
+  });
+
+  // If I'm not in top 15, add separator + my row
+  if (myPos >= 15 && myData) {
+    const sep = document.createElement('div');
+    sep.style.cssText = 'text-align:center;font-size:.72rem;color:#444;padding:.4rem;letter-spacing:2px;';
+    sep.textContent = '• • •';
+    list.appendChild(sep);
+    const myDiv = document.createElement('div');
+    myDiv.className = 'lb-item me';
+    myDiv.innerHTML = `
+      <div class="lb-item-rank">#${myPos+1}</div>
+      <div class="lb-item-avatar">${fbPlayerData.avatar} ${fbPlayerData.flag}</div>
+      <div class="lb-item-name">${fbPlayerData.name} <span style="color:#c9a84c;font-size:.7rem">(toi)</span></div>
+      <div style="text-align:right">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:#2dd4bf">${state.xp.toLocaleString()} XP</div>
+        <div style="font-size:.7rem;color:#f97316">🔥${state.streak}j</div>
+      </div>`;
+    list.appendChild(myDiv);
+  }
+}
+
+// ── Auto-sync XP every time gainXP is called ──────────────────
+// (hooked below into gainXP)
+
+// ═══════════════════════════════════════════════════════════════
+// ONBOARDING LOGIC
+// ═══════════════════════════════════════════════════════════════
+const AVATARS = ['🧑','👩','👨','🧒','👩🏾','👨🏾','🧑🏻','👩🏼','👨🏼','🧑🏿','👩🏿','👨🏿','🦸','🦸‍♀️','🥷','🎓','🎤','🚀'];
+const FLAGS   = ['🇫🇷','🇲🇦','🇩🇿','🇹🇳','🇨🇮','🇸🇳','🇨🇲','🇬🇳','🇧🇯','🇧🇫','🇲🇱','🇳🇪','🇧🇷','🇺🇸','🇬🇧','🇪🇸','🇩🇪','🇧🇪','🇨🇦','🇨🇭'];
+
+let selectedAvatar = '🧑';
+let selectedFlag   = '🇫🇷';
+
+function buildOnboarding() {
+  // Avatar grid
+  const ag = document.getElementById('avatar-grid');
+  if (ag) {
+    ag.innerHTML = '';
+    AVATARS.forEach(av => {
+      const btn = document.createElement('button');
+      btn.textContent = av;
+      btn.style.cssText = `width:42px;height:42px;border-radius:10px;border:2px solid ${av===selectedAvatar?'#c9a84c':'rgba(255,255,255,.07)'};background:${av===selectedAvatar?'rgba(201,168,76,.12)':'#111'};font-size:1.3rem;cursor:pointer;transition:all .15s;`;
+      btn.onclick = () => { selectedAvatar = av; buildOnboarding(); };
+      ag.appendChild(btn);
+    });
+  }
+  // Flag grid
+  const fg = document.getElementById('flag-grid');
+  if (fg) {
+    fg.innerHTML = '';
+    FLAGS.forEach(fl => {
+      const btn = document.createElement('button');
+      btn.textContent = fl;
+      btn.style.cssText = `width:38px;height:38px;border-radius:8px;border:2px solid ${fl===selectedFlag?'#c9a84c':'rgba(255,255,255,.07)'};background:${fl===selectedFlag?'rgba(201,168,76,.12)':'#111'};font-size:1.2rem;cursor:pointer;transition:all .15s;`;
+      btn.onclick = () => { selectedFlag = fl; buildOnboarding(); };
+      fg.appendChild(btn);
+    });
+  }
+  checkOnboardingReady();
+}
+
+function checkOnboardingReady() {
+  const input = document.getElementById('player-name-input');
+  const btn   = document.getElementById('btn-start-game');
+  const err   = document.getElementById('name-error');
+  if (!input || !btn) return;
+  const name = input.value.trim();
+  const valid = name.length >= 2;
+  btn.disabled = !valid;
+  btn.style.opacity = valid ? '1' : '0.5';
+  btn.style.cursor  = valid ? 'pointer' : 'not-allowed';
+  btn.style.background = valid ? 'linear-gradient(135deg,#c9a84c,#7a5c1e)' : '#222';
+  btn.style.color = valid ? '#0a0600' : '#555';
+  if (err) err.style.display = (input.value.length > 0 && !valid) ? 'block' : 'none';
+}
+
+function completeOnboarding() {
+  const input = document.getElementById('player-name-input');
+  if (!input) return;
+  const name = input.value.trim();
+  if (name.length < 2) return;
+
+  fbPlayerData.name   = name;
+  fbPlayerData.avatar = selectedAvatar;
+  fbPlayerData.flag   = selectedFlag;
+  fbUserId = getFbUserId();
+
+  // Save to localStorage
+  localStorage.setItem('player_name',   name);
+  localStorage.setItem('player_avatar', selectedAvatar);
+  localStorage.setItem('player_flag',   selectedFlag);
+  localStorage.setItem('onboarding_done', '1');
+
+  // Push to Firebase immediately
+  fbSavePlayer();
+
+  showScreen('splash');
+}
+
+function loadPlayerProfile() {
+  const done = localStorage.getItem('onboarding_done');
+  if (done) {
+    fbPlayerData.name   = localStorage.getItem('player_name')   || 'Joueur';
+    fbPlayerData.avatar = localStorage.getItem('player_avatar') || '🧑';
+    fbPlayerData.flag   = localStorage.getItem('player_flag')   || '🇫🇷';
+    fbUserId = getFbUserId();
+    return true; // onboarding already done
+  }
+  return false; // needs onboarding
+}
+
+
+const state = {
+  xp:0, streak:1, completedEps:[], currentEp:0, currentStep:0,
+  quizAnswered:false, repeatCounts:{}, selectedVoice:'us-female',
+  theme:'dark',
+  // Player sub-section: 'scene' | 'shadow' | 'quiz' | 'done'
+  playerSection:'scene',
+  actionCallback: null, // what btn-action does right now
+};
+
+// ══════════════════════════════════
+// VOICES — smart detection for mobile
+// ══════════════════════════════════
+// ══════════════════════════════════
+// VOICE SYSTEM — ElevenLabs TTS
+// 4 vraies voix professionnelles via API.
+// Fallback sur Web Speech si pas de clé.
+// ══════════════════════════════════
+const VOICE_DEFS = [
+  { id:'us-female',
+    flag:'🇺🇸', name:'Emma',  accent:'Américain',   gender:'♀ Féminin',
+    // ElevenLabs voice ID — "Rachel" (US female, warm, clear)
+    elId:'21m00Tcm4TlvDq8ikWAM',
+    elName:'Rachel',
+    // Web Speech fallback
+    wsLang:'en-US', wsGenderKw:['female','woman','samantha','ava','karen','zira'],
+    wsPitch:1.1, wsRate:0.88 },
+
+  { id:'us-male',
+    flag:'🇺🇸', name:'Sam',   accent:'Américain',   gender:'♂ Masculin',
+    // ElevenLabs — "Adam" (US male, deep, authoritative)
+    elId:'pNInz6obpgDQGcFmaJgB',
+    elName:'Adam',
+    wsLang:'en-US', wsGenderKw:['male','man','david','alex','tom','fred','Microsoft David','Google US English'],
+    wsPitch:0.75, wsRate:0.82 },
+
+  { id:'uk-female',
+    flag:'🇬🇧', name:'Sophie', accent:'Britannique', gender:'♀ Féminin',
+    // ElevenLabs — "Charlotte" (British female, elegant)
+    elId:'XB0fDUnXU5powFXDhCwa',
+    elName:'Charlotte',
+    wsLang:'en-GB', wsGenderKw:['female','woman','hazel','kate','tessa','martha'],
+    wsPitch:1.1, wsRate:0.88 },
+
+  { id:'uk-male',
+    flag:'🇬🇧', name:'James',  accent:'Britannique', gender:'♂ Masculin',
+    // ElevenLabs — "Daniel" (British male, deep, confident)
+    elId:'onwK4e9ZLuTAKqWW03F9',
+    elName:'Daniel',
+    wsLang:'en-GB', wsGenderKw:['male','man','daniel','oliver','arthur','lee','Google UK English Male'],
+    wsPitch:0.72, wsRate:0.82 },
+];
+
+// ── ElevenLabs config ──
+let elApiKey = '';       // set by user in settings
+let _audioCache = {};    // text → blob URL cache
+
+async function playWithElevenLabs(text, def) {
+  // Check cache first
+  const cacheKey = def.id + ':' + text;
+  if (_audioCache[cacheKey]) {
+    return _playBlob(_audioCache[cacheKey]);
+  }
+  try {
+    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${def.elId}`, {
+      method: 'POST',
+      headers: {
+        'xi-api-key': elApiKey,
+        'Content-Type': 'application/json',
+        'Accept': 'audio/mpeg',
+      },
+      body: JSON.stringify({
+        text,
+        model_id: 'eleven_multilingual_v2',
+        voice_settings: { stability: 0.5, similarity_boost: 0.75, style: 0.0 }
+      })
+    });
+    if (!res.ok) throw new Error('EL ' + res.status);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    _audioCache[cacheKey] = url;
+    _playBlob(url);
+  } catch(e) {
+    console.warn('ElevenLabs error, falling back to Web Speech:', e);
+    playWithWebSpeech(text, def);
+  }
+}
+
+function _playBlob(url) {
+  const audio = new Audio(url);
+  audio.play().catch(() => {});
+  return audio;
+}
+
+// ── Web Speech fallback ──
+let _cachedVoices = [];
+function getVoices() {
+  const v = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+  if (v.length) _cachedVoices = v;
+  return _cachedVoices.length ? _cachedVoices : v;
+}
+if (window.speechSynthesis) {
+  speechSynthesis.getVoices();
+  speechSynthesis.onvoiceschanged = () => { _cachedVoices = speechSynthesis.getVoices(); };
+}
+function normLang(l) { return (l||'').toLowerCase().replace('_','-'); }
+
+function pickWebSpeechVoice(def) {
+  const voices = getVoices();
+  const en = voices.filter(v => normLang(v.lang).startsWith('en'));
+  const isMale = def.wsGenderKw.includes('male');
+
+  // 1. Exact keyword match in voice name
+  for (const kw of def.wsGenderKw) {
+    const v = en.find(v => v.name.toLowerCase().includes(kw.toLowerCase()));
+    if (v) return v;
+  }
+
+  // 2. Gender heuristic — male voices often have lower index or specific names
+  if (isMale) {
+    // Try to find any voice that sounds male by common name patterns
+    const malePatterns = ['male','man','david','james','daniel','oliver','arthur','alex','tom','fred','george','mark','paul'];
+    for (const pat of malePatterns) {
+      const v = en.find(v => v.name.toLowerCase().includes(pat));
+      if (v) return v;
+    }
+    // On Android there's usually only 1 voice — use it but with low pitch
+    // Return the last English voice (often differs from default female)
+    if (en.length > 1) return en[en.length - 1];
+  } else {
+    const femalePatterns = ['female','woman','samantha','karen','zira','tessa','kate','hazel','martha','victoria','serena'];
+    for (const pat of femalePatterns) {
+      const v = en.find(v => v.name.toLowerCase().includes(pat));
+      if (v) return v;
+    }
+    if (en.length > 0) return en[0];
+  }
+
+  // 3. Exact lang match
+  const lv = voices.find(v => normLang(v.lang) === normLang(def.wsLang));
+  if (lv) return lv;
+
+  // 4. Any English
+  return en[0] || null;
+}
+
+function playWithWebSpeech(text, def) {
+  if (!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang   = def.wsLang;
+  utt.pitch  = def.wsPitch;
+  utt.rate   = def.wsRate;
+  utt.volume = 1;
+  const v = pickWebSpeechVoice(def);
+  if (v) { utt.voice = v; utt.lang = v.lang; }
+  speechSynthesis.speak(utt);
+}
+
+// ── Main play function ──
+function playAudio(text) {
+  const def = VOICE_DEFS.find(v => v.id === state.selectedVoice) || VOICE_DEFS[0];
+  if (elApiKey && elApiKey.length > 10) {
+    playWithElevenLabs(text, def);
+  } else {
+    playWithWebSpeech(text, def);
+  }
+}
+
+// ══════════════════════════════════
+// THEME
+// ══════════════════════════════════
+function toggleTheme() {
+  state.theme = state.theme === 'dark' ? 'light' : 'dark';
+  applyTheme();
+}
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', state.theme);
+  const t = document.getElementById('theme-track');
+  if (t) t.className = 'toggle-track' + (state.theme === 'light' ? ' on' : '');
+}
+
+// ══════════════════════════════════
+// EPISODES DATA
+// ══════════════════════════════════
+const EPISODES = [
+  { id:0, title:"Missed Flight", genre:"survival", genreLabel:"SURVIE", emoji:"✈️",
+    location:"JFK AIRPORT — NEW YORK", xp:150, words:"12 phrases clés",
+    desc:"Tu rates ton vol. L'agent d'enregistrement t'ignore. Tu as 10 minutes pour tout régler.",
+    cliffhanger:"L'agent te regarde et dit : \"There's one seat left… but someone else wants it.\"", cfIcon:"✈️",
+    steps:[
+      { context:"Tu arrives en courant au comptoir. Le panneau affiche GATE CLOSED. L'agente lève les yeux.",
+        dialogue:[
+          { speaker:"Agent (Sarah)", avatar:"👩‍✈️", side:"them",
+            text:"I'm sorry, sir. The gate is <span class='word-key' data-word='closed' data-pron='/kloʊzd/' data-def='Fermé — plus accessible'>closed</span>. You missed your flight.",
+            fr:"Je suis désolée monsieur. La porte est fermée. Vous avez raté votre vol." },
+          { speaker:"Toi", avatar:"👤", side:"you",
+            text:"Please, I need to <span class='word-key' data-word='get on' data-pron='/ɡɛt ɒn/' data-def='Monter dans (un avion...)'>get on</span> that plane. It's an <span class='word-key' data-word='emergency' data-pron='/ɪˈmɜːrdʒənsi/' data-def='Urgence — situation critique'>emergency</span>.",
+            fr:"S'il vous plaît, j'ai besoin de monter dans cet avion. C'est une urgence." }
+        ],
+        shadow:{ phrase:"Please, I need to get on that plane. It's an emergency.", phonetic:"/pliːz aɪ niːd tə ɡɛt ɒn ðæt pleɪn — ɪts ən ɪˈmɜːrdʒənsi/" },
+        quiz:{ q:"L'agente dit que le vol est fermé. Comment dis-tu « j'ai raté mon vol » ?",
+          options:["I missed my flight.","I lost my plane.","My flight is gone.","I forget my flight."], correct:0,
+          feedback:["✅ Parfait ! \"I missed my flight\" est l'expression exacte.","❌ \"Lost\" ne s'utilise pas pour les vols. \"Missed\" = rater.","❌ Pas idiomatique. Dis plutôt \"I missed my flight.\"","❌ \"Forget\" = oublier. Ici tu veux dire que tu n'as pas été là à temps."] }
+      },
+      { context:"Sarah tape sur son clavier. Elle hésite. Il reste peut-être une solution...",
+        dialogue:[
+          { speaker:"Agent (Sarah)", avatar:"👩‍✈️", side:"them",
+            text:"Let me <span class='word-key' data-word='check' data-pron='/tʃɛk/' data-def='Vérifier'>check</span> if there's anything I can do. What's your <span class='word-key' data-word='destination' data-pron='/ˌdɛstɪˈneɪʃən/' data-def='Destination — où tu veux aller'>destination</span>?",
+            fr:"Laissez-moi vérifier si je peux faire quelque chose. Quelle est votre destination ?" },
+          { speaker:"Toi", avatar:"👤", side:"you",
+            text:"Los Angeles. I have a <span class='word-key' data-word='connecting flight' data-pron='/kəˈnɛktɪŋ flaɪt/' data-def='Vol de correspondance'>connecting flight</span> in two hours.",
+            fr:"Los Angeles. J'ai une correspondance dans deux heures." }
+        ],
+        shadow:{ phrase:"Los Angeles. I have a connecting flight in two hours.", phonetic:"/lɒs ˈændʒələs — aɪ hæv ə kəˈnɛktɪŋ flaɪt ɪn tuː ˈaʊərz/" },
+        quiz:{ q:"Comment demandes-tu poliment à quelqu'un de vérifier quelque chose ?",
+          options:["Could you check for me, please?","You check now!","Verify this immediately.","Can you look my situation?"], correct:0,
+          feedback:["✅ Excellent ! \"Could you check for me, please?\" est parfaitement poli.","❌ Trop agressif. Toujours ajouter \"could you\" + \"please\".","❌ \"Verify\" est trop formel. Dans la vie quotidienne, on dit \"check\".","❌ \"Look my situation\" n'est pas correct. Dis \"look at my situation\"."] }
+      },
+      { context:"Sarah trouve quelque chose sur son écran. Son regard change. Tu retiens ton souffle.",
+        dialogue:[
+          { speaker:"Agent (Sarah)", avatar:"👩‍✈️", side:"them",
+            text:"There's one seat left on the next flight. It <span class='word-key' data-word='departs' data-pron='/dɪˈpɑːrts/' data-def='Part — prend son départ'>departs</span> in 45 minutes. But it's <span class='word-key' data-word='first class' data-pron='/fɜːrst klɑːs/' data-def='Première classe'>first class</span>.",
+            fr:"Il reste une place sur le prochain vol. Il part dans 45 minutes. Mais c'est en première classe." },
+          { speaker:"Toi", avatar:"👤", side:"you",
+            text:"I'll <span class='word-key' data-word='take it' data-pron='/teɪk ɪt/' data-def='Je le prends — accepter une offre'>take it</span>. How much is the <span class='word-key' data-word='difference' data-pron='/ˈdɪfrəns/' data-def='Différence (de prix)'>difference</span>?",
+            fr:"Je le prends. Combien coûte la différence ?" }
+        ],
+        shadow:{ phrase:"I'll take it. How much is the difference?", phonetic:"/aɪl teɪk ɪt — haʊ mʌtʃ ɪz ðə ˈdɪfrəns/" },
+        quiz:{ q:"Sarah dit \"There's one seat left.\" Que signifie \"left\" ici ?",
+          options:["Il reste (disponible)","À gauche","Parti","Réservé"], correct:0,
+          feedback:["✅ Exact ! \"Left\" ici = il en reste un (remaining).","❌ \"Left\" = gauche seulement comme direction. Ici = remaining.","❌ Ce serait \"gone\" ou \"taken\". \"Left\" = disponible encore.","❌ Ce serait \"reserved\" ou \"booked\". \"Left\" = pas encore pris."] }
+      }
+    ]
+  },
+  { id:1, title:"The Wrong Room", genre:"thriller", genreLabel:"THRILLER", emoji:"🔐",
+    location:"HOTEL CONTINENTAL — MANHATTAN", xp:200, words:"14 phrases clés",
+    desc:"Tu entres dans ta chambre d'hôtel. Quelqu'un y est déjà. Et il ne veut pas partir.",
+    cliffhanger:"L'étranger sourit : \"I've been waiting for you. We need to talk about what you saw yesterday.\"", cfIcon:"🔐",
+    steps:[
+      { context:"Tu glisses ta carte dans la porte. Un homme en costume est assis sur ton lit.",
+        dialogue:[
+          { speaker:"Toi", avatar:"👤", side:"you",
+            text:"What are you doing in my room? I'm going to <span class='word-key' data-word='call' data-pron='/kɔːl/' data-def='Appeler'>call</span> <span class='word-key' data-word='security' data-pron='/sɪˈkjʊərɪti/' data-def='Sécurité'>security</span>.",
+            fr:"Qu'est-ce que vous faites dans ma chambre ? Je vais appeler la sécurité." },
+          { speaker:"L'étranger", avatar:"🕴️", side:"them",
+            text:"<span class='word-key' data-word='Calm down' data-pron='/kɑːm daʊn/' data-def='Calme-toi'>Calm down</span>. I'm not here to <span class='word-key' data-word='hurt' data-pron='/hɜːrt/' data-def='Blesser — faire du mal'>hurt</span> you. Just listen.",
+            fr:"Calme-toi. Je ne suis pas là pour te faire du mal. Écoute juste." }
+        ],
+        shadow:{ phrase:"What are you doing in my room? I'm going to call security.", phonetic:"/wɒt ɑːr juː ˈduːɪŋ ɪn maɪ ruːm — aɪm ˈɡoʊɪŋ tə kɔːl sɪˈkjʊərɪti/" },
+        quiz:{ q:"Comment exprimes-tu une menace sérieuse en anglais ?",
+          options:["I'm going to call security.","I will security call.","I call security now!","Security I call."], correct:0,
+          feedback:["✅ Parfait ! \"I'm going to\" + infinitif = menace directe et naturelle.","❌ L'ordre des mots est faux. Toujours : sujet + verbe + complément.","❌ Grammaticalement possible mais moins naturel qu'avec \"going to\".","❌ Ordre des mots complètement incorrect en anglais."] }
+      },
+      { context:"L'homme ne bouge pas. Il sort une photo de sa poche. C'est toi dessus.",
+        dialogue:[
+          { speaker:"L'étranger", avatar:"🕴️", side:"them",
+            text:"We know who you are. And we know what you <span class='word-key' data-word='witnessed' data-pron='/ˈwɪtnɪst/' data-def='As été témoin de — a vu'>witnessed</span> at the <span class='word-key' data-word='conference' data-pron='/ˈkɒnfərəns/' data-def='Conférence — réunion officielle'>conference</span>.",
+            fr:"Nous savons qui vous êtes. Et nous savons ce dont vous avez été témoin lors de la conférence." },
+          { speaker:"Toi", avatar:"👤", side:"you",
+            text:"I don't know what you're <span class='word-key' data-word='talking about' data-pron='/ˈtɔːkɪŋ əˈbaʊt/' data-def='En train de parler de'>talking about</span>. You need to <span class='word-key' data-word='leave' data-pron='/liːv/' data-def='Partir — quitter les lieux'>leave</span>. Now.",
+            fr:"Je ne sais pas de quoi vous parlez. Vous devez partir. Maintenant." }
+        ],
+        shadow:{ phrase:"I don't know what you're talking about. You need to leave. Now.", phonetic:"/aɪ doʊnt noʊ wɒt jʊər ˈtɔːkɪŋ əˈbaʊt — juː niːd tə liːv — naʊ/" },
+        quiz:{ q:"\"I don't know what you're talking about\" — quand utilises-tu cette phrase ?",
+          options:["Quand tu veux nier connaître un sujet","Quand tu ne comprends pas la langue","Quand tu veux changer de sujet","Quand tu es en colère"], correct:0,
+          feedback:["✅ Exact ! C'est l'expression parfaite pour nier être au courant de quelque chose.","❌ Si tu ne comprends pas la langue, tu dirais \"I don't understand\".","❌ Pour changer de sujet tu dirais \"Let's talk about something else\".","❌ La colère seule ne justifie pas cette phrase."] }
+      }
+    ]
+  },
+  { id:2, title:"First Coffee", genre:"romance", genreLabel:"ROMANCE", emoji:"☕",
+    location:"BLUE BOTTLE COFFEE — BROOKLYN", xp:130, words:"10 phrases clés",
+    desc:"Tu commandes un café. La barista sourit. Une conversation s'installe.",
+    cliffhanger:"Elle glisse un papier. Il y a un numéro… et : \"Are you free on Saturday?\"", cfIcon:"☕",
+    steps:[
+      { context:"La queue avance. Tu regardes le menu. La barista te regarde en souriant.",
+        dialogue:[
+          { speaker:"Maya (barista)", avatar:"👩", side:"them",
+            text:"Hi! What can I <span class='word-key' data-word='get' data-pron='/ɡɛt/' data-def='Préparer — dans un café'>get</span> for you today?",
+            fr:"Bonjour ! Qu'est-ce que je vous prépare aujourd'hui ?" },
+          { speaker:"Toi", avatar:"👤", side:"you",
+            text:"Can I get a <span class='word-key' data-word='medium' data-pron='/ˈmiːdiəm/' data-def='Taille medium'>medium</span> <span class='word-key' data-word='latte' data-pron='/ˈlɑːteɪ/' data-def='Café latte'>latte</span>, please? <span class='word-key' data-word='To go' data-pron='/tə ɡoʊ/' data-def='À emporter'>To go</span>.",
+            fr:"Je peux avoir un latte taille moyenne, s'il vous plaît ? À emporter." }
+        ],
+        shadow:{ phrase:"Can I get a medium latte, please? To go.", phonetic:"/kæn aɪ ɡɛt ə ˈmiːdiəm ˈlɑːteɪ pliːz — tə ɡoʊ/" },
+        quiz:{ q:"Comment dit-on \"pour manger/boire ici\" (l'opposé de \"to go\") ?",
+          options:["For here.","To stay.","In place.","Sitting."], correct:0,
+          feedback:["✅ Parfait ! \"For here\" = sur place. \"To go\" = à emporter.","❌ \"To stay\" n'est pas utilisé dans ce contexte aux USA.","❌ \"In place\" n'est pas l'expression pour commander sur place.","❌ \"Sitting\" ne s'utilise pas pour commander."] }
+      },
+      { context:"Elle prépare ton café. Vos regards se croisent deux fois.",
+        dialogue:[
+          { speaker:"Toi", avatar:"👤", side:"you",
+            text:"This place is <span class='word-key' data-word='amazing' data-pron='/əˈmeɪzɪŋ/' data-def='Incroyable'>amazing</span>. Is it always this <span class='word-key' data-word='busy' data-pron='/ˈbɪzi/' data-def='Animé — beaucoup de monde'>busy</span>?",
+            fr:"Cet endroit est incroyable. C'est toujours aussi animé ?" },
+          { speaker:"Maya (barista)", avatar:"👩", side:"them",
+            text:"Only on <span class='word-key' data-word='weekends' data-pron='/ˈwiːkɛndz/' data-def='Weekends'>weekends</span>. You're not from <span class='word-key' data-word='around here' data-pron='/əˈraʊnd hɪər/' data-def='Du coin'>around here</span>, are you?",
+            fr:"Seulement le week-end. Vous n'êtes pas du coin, si ?" }
+        ],
+        shadow:{ phrase:"This place is amazing. Is it always this busy?", phonetic:"/ðɪs pleɪs ɪz əˈmeɪzɪŋ — ɪz ɪt ˈɔːlweɪz ðɪs ˈbɪzi/" },
+        quiz:{ q:"\"You're not from around here, are you?\" — Quel type de phrase est-ce ?",
+          options:["Question-tag (confirmation cherchée)","Question directe","Affirmation simple","Question rhétorique"], correct:0,
+          feedback:["✅ Exact ! \"Are you?\" à la fin = question-tag.","❌ Une question directe serait \"Where are you from?\"","❌ C'est une question, pas une affirmation.","❌ Ce n'est pas rhétorique — elle attend vraiment une réponse."] }
+      }
+    ]
+  },
+  { id:3, title:"Hospital Rush", genre:"survival", genreLabel:"URGENCE", emoji:"🏥", location:"BELLEVUE HOSPITAL — NYC", xp:180, words:"13 phrases clés", desc:"Ton ami s'est évanoui dans la rue. Tu es aux urgences.", cliffhanger:"Le médecin dit : \"We found something in his blood. Do you know if he takes any medication?\"", cfIcon:"🏥", steps:[
+      { context:"Ton ami Marcus s'effondre sur le trottoir. Tu cours vers l'entrée des urgences.",
+        dialogue:[
+          { speaker:"Infirmière (Jen)", avatar:"👩‍⚕️", side:"them",
+            text:"What happened? Is he <span class='word-key' data-word='conscious' data-pron='/ˈkɒnʃəs/' data-def='Conscient — éveillé, qui réagit'>conscious</span>?",
+            fr:"Que s'est-il passé ? Est-il conscient ?" },
+          { speaker:"Toi", avatar:"👤", side:"you",
+            text:"He just <span class='word-key' data-word='collapsed' data-pron='/kəˈlæpst/' data-def='S'est effondré — est tombé soudainement'>collapsed</span>. He was <span class='word-key' data-word='complaining' data-pron='/kəmˈpleɪnɪŋ/' data-def='Se plaignait — exprimait une douleur'>complaining</span> about chest pain.",
+            fr:"Il vient de s'effondrer. Il se plaignait de douleurs à la poitrine." }
+        ],
+        shadow:{ phrase:"He just collapsed. He was complaining about chest pain.", phonetic:"/hiː dʒʌst kəˈlæpst — hiː wɒz kəmˈpleɪnɪŋ əˈbaʊt tʃɛst peɪn/" },
+        quiz:{ q:"Comment dit-on 'il s'est évanoui' en anglais ?",
+          options:["He passed out.","He fell asleep.","He dropped down.","He went off."], correct:0,
+          feedback:["✅ Exact ! \"He passed out\" = s'évanouir. \"He collapsed\" aussi est correct.","❌ \"Fell asleep\" = s'endormir, pas s'évanouir.","❌ \"Dropped down\" n'est pas l'expression idiomatique.","❌ \"Went off\" signifie autre chose (alarme qui sonne...)."] }
+      },
+      { context:"L'infirmière t'arrête. Elle a besoin d'informations avant de te laisser entrer.",
+        dialogue:[
+          { speaker:"Infirmière (Jen)", avatar:"👩‍⚕️", side:"them",
+            text:"I need his full name and date of birth. Do you know if he has any <span class='word-key' data-word='allergies' data-pron='/ˈælədʒiz/' data-def='Allergies — réactions à certaines substances'>allergies</span>?",
+            fr:"J'ai besoin de son nom complet et de sa date de naissance. A-t-il des allergies ?" },
+          { speaker:"Toi", avatar:"👤", side:"you",
+            text:"His name is Marcus Reid. I'm not sure about allergies, but he's <span class='word-key' data-word='diabetic' data-pron='/ˌdaɪəˈbɛtɪk/' data-def='Diabétique — malade du diabète'>diabetic</span>.",
+            fr:"Il s'appelle Marcus Reid. Je ne suis pas sûr des allergies, mais il est diabétique." }
+        ],
+        shadow:{ phrase:"His name is Marcus Reid. I'm not sure about allergies, but he's diabetic.", phonetic:"/hɪz neɪm ɪz ˈmɑːrkəs riːd — aɪm nɒt ʃʊər əˈbaʊt ˈælədʒiz — bʌt hiːz ˌdaɪəˈbɛtɪk/" },
+        quiz:{ q:"Comment exprimes-tu une incertitude en anglais ?",
+          options:["I'm not sure.","I don't know nothing.","Maybe I think so.","I have no idea about."], correct:0,
+          feedback:["✅ Parfait ! \"I'm not sure\" est l'expression la plus naturelle.","❌ Double négation incorrecte. En anglais : \"I don't know anything.\"","❌ \"Maybe I think so\" est redondant et peu naturel.","❌ Grammaticalement incorrect. Dis \"I have no idea.\""] }
+      },
+      { context:"Le médecin sort après 20 minutes. Son visage est sérieux.",
+        dialogue:[
+          { speaker:"Dr. Williams", avatar:"👨‍⚕️", side:"them",
+            text:"Your friend is <span class='word-key' data-word='stable' data-pron='/ˈsteɪbl/' data-def='Stable — hors de danger immédiat'>stable</span>. But we found something in his blood. Does he take any <span class='word-key' data-word='medication' data-pron='/ˌmɛdɪˈkeɪʃən/' data-def='Médicaments — traitements médicaux'>medication</span>?",
+            fr:"Votre ami est stable. Mais nous avons trouvé quelque chose dans son sang. Prend-il des médicaments ?" },
+          { speaker:"Toi", avatar:"👤", side:"you",
+            text:"Not that I know of. What did you <span class='word-key' data-word='find' data-pron='/faɪnd/' data-def='Trouver — découvrir quelque chose'>find</span>? Is he going to be <span class='word-key' data-word='alright' data-pron='/ɔːlˈraɪt/' data-def='Bien — en bonne santé, sauf'>alright</span>?",
+            fr:"Pas à ma connaissance. Qu'avez-vous trouvé ? Va-t-il s'en sortir ?" }
+        ],
+        shadow:{ phrase:"Not that I know of. Is he going to be alright?", phonetic:"/nɒt ðæt aɪ noʊ ɒv — ɪz hiː ˈɡoʊɪŋ tə biː ɔːlˈraɪt/" },
+        quiz:{ q:"Comment dit-on 'pas à ma connaissance' en anglais ?",
+          options:["Not that I know of.","I don't think I know.","Not in my knowledge.","I have no knowledge."], correct:0,
+          feedback:["✅ Parfait ! \"Not that I know of\" est une expression très courante et naturelle.","❌ Pas idiomatique. Utilise la formule fixe \"not that I know of\".","❌ \"Not in my knowledge\" n'est pas une expression anglophone.","❌ Trop formel et pas idiomatique dans ce contexte."] }
+      }
+    ], locked:false },
+  { id:4, title:"The Witness", genre:"thriller", genreLabel:"THRILLER", emoji:"🔍", location:"NYPD 19TH PRECINCT", xp:220, words:"15 phrases clés", desc:"La police t'interroge. Tu as vu quelque chose hier soir.", cliffhanger:"L'inspecteur pose une photo sur la table. C'est l'homme de ta chambre d'hôtel.", cfIcon:"🔍", steps:[
+      { context:"La salle d'interrogatoire est froide. L'inspecteur Torres entre sans te saluer.",
+        dialogue:[
+          { speaker:"Insp. Torres", avatar:"🕵️", side:"them",
+            text:"Where were you on the night of the <span class='word-key' data-word='incident' data-pron='/ˈɪnsɪdənt/' data-def='Incident — événement grave, souvent criminel'>incident</span>? And don't <span class='word-key' data-word='lie' data-pron='/laɪ/' data-def='Mentir — dire quelque chose de faux'>lie</span> to me.",
+            fr:"Où étiez-vous la nuit de l'incident ? Et ne me mentez pas." },
+          { speaker:"Toi", avatar:"👤", side:"you",
+            text:"I was at the <span class='word-key' data-word='conference' data-pron='/ˈkɒnfərəns/' data-def='Conférence — réunion formelle avec plusieurs personnes'>conference</span>. I already told the other <span class='word-key' data-word='officer' data-pron='/ˈɒfɪsər/' data-def='Officier — agent de police'>officer</span>.",
+            fr:"J'étais à la conférence. Je l'ai déjà dit à l'autre agent." }
+        ],
+        shadow:{ phrase:"I was at the conference. I already told the other officer.", phonetic:"/aɪ wɒz æt ðə ˈkɒnfərəns — aɪ ɔːlrɛdi toʊld ðə ˈʌðər ˈɒfɪsər/" },
+        quiz:{ q:"Comment demandes-tu poliment à parler à un avocat ?",
+          options:["I'd like to speak to a lawyer, please.","Give me a lawyer now!","I want lawyer.","Bring me my attorney immediately."], correct:0,
+          feedback:["✅ Parfait ! \"I'd like to speak to a lawyer\" est poli, clair et legal.","❌ Trop agressif. Même dans une situation tendue, la politesse aide.","❌ Grammaticalement incorrect — il manque l'article \"a\".","❌ Correct mais très formel. \"Lawyer\" est plus courant que \"attorney\"."] }
+      },
+      { context:"Torres pose une photo sur la table. C'est l'homme de ta chambre d'hôtel.",
+        dialogue:[
+          { speaker:"Insp. Torres", avatar:"🕵️", side:"them",
+            text:"Do you <span class='word-key' data-word='recognize' data-pron='/ˈrɛkəɡnaɪz/' data-def='Reconnaître — identifier quelqu'un ou quelque chose'>recognize</span> this man? Think carefully before you <span class='word-key' data-word='answer' data-pron='/ˈɑːnsər/' data-def='Répondre — donner une réponse'>answer</span>.",
+            fr:"Reconnaissez-vous cet homme ? Réfléchissez bien avant de répondre." },
+          { speaker:"Toi", avatar:"👤", side:"you",
+            text:"I've never seen him before. Am I under <span class='word-key' data-word='arrest' data-pron='/əˈrɛst/' data-def='Arrestation — être arrêté par la police'>arrest</span>? Because if not, I'd like to <span class='word-key' data-word='leave' data-pron='/liːv/' data-def='Partir — quitter un lieu'>leave</span>.",
+            fr:"Je ne l'ai jamais vu. Suis-je en état d'arrestation ? Parce que sinon, j'aimerais partir." }
+        ],
+        shadow:{ phrase:"I've never seen him before. Am I under arrest?", phonetic:"/aɪv ˈnɛvər siːn hɪm bɪˈfɔːr — æm aɪ ˈʌndər əˈrɛst/" },
+        quiz:{ q:"Torres dit \"think carefully.\" Que signifie \"carefully\" ?",
+          options:["Attentivement, avec soin","Rapidement","Honnêtement","Calmement"], correct:0,
+          feedback:["✅ Exact ! \"Carefully\" = avec soin, attention. \"Be careful\" = fais attention.","❌ \"Quickly\" ou \"rapidly\" = rapidement.","❌ \"Honestly\" = honnêtement.","❌ \"Calmly\" = calmement."] }
+      },
+      { context:"Torres quitte la pièce. Une autre inspectrice entre — plus jeune, différente approche.",
+        dialogue:[
+          { speaker:"Insp. Chen", avatar:"👩‍💼", side:"them",
+            text:"I'm going to be straight with you. That man is <span class='word-key' data-word='dangerous' data-pron='/ˈdeɪndʒərəs/' data-def='Dangereux — qui représente un risque'>dangerous</span>. We need your <span class='word-key' data-word='cooperation' data-pron='/koʊˌɒpəˈreɪʃən/' data-def='Coopération — aide, collaboration'>cooperation</span>.",
+            fr:"Je vais être directe avec vous. Cet homme est dangereux. Nous avons besoin de votre coopération." },
+          { speaker:"Toi", avatar:"👤", side:"you",
+            text:"What kind of <span class='word-key' data-word='protection' data-pron='/prəˈtɛkʃən/' data-def='Protection — être mis en sécurité'>protection</span> can you offer me if I <span class='word-key' data-word='talk' data-pron='/tɔːk/' data-def='Parler — partager des informations'>talk</span>?",
+            fr:"Quel genre de protection pouvez-vous m'offrir si je parle ?" }
+        ],
+        shadow:{ phrase:"What kind of protection can you offer me if I talk?", phonetic:"/wɒt kaɪnd ɒv prəˈtɛkʃən kæn juː ˈɒfər miː ɪf aɪ tɔːk/" },
+        quiz:{ q:"Comment dit-on \"je vais être direct(e) avec toi\" ?",
+          options:["I'm going to be straight with you.","I will tell you the truth now.","Let me be honest to you.","I want to say something true."], correct:0,
+          feedback:["✅ Parfait ! \"Straight with you\" est l'expression idiomatique exacte.","❌ Correct mais moins naturel. \"Straight\" est plus direct.","❌ On dit \"honest with you\" pas \"honest to you\".","❌ Trop vague et peu naturel."] }
+      }
+    ], locked:false },
+  { id:5, title:"Lost Luggage", genre:"survival", genreLabel:"SURVIE", emoji:"🧳", location:"LAGUARDIA AIRPORT — NYC", xp:150, words:"11 phrases clés", desc:"Tes bagages n'arrivent pas. Deux heures d'attente.", cliffhanger:"L'agent trouve ton sac... mais il est ouvert.", cfIcon:"🧳", steps:[
+      { context:"Le tapis roulant tourne depuis 40 minutes. Ta valise n'arrive pas. Tu vas au comptoir.",
+        dialogue:[
+          { speaker:"Agent (Tom)", avatar:"👨‍✈️", side:"them",
+            text:"Can I help you? Your <span class='word-key' data-word='baggage claim' data-pron='/ˈbæɡɪdʒ kleɪm/' data-def='Récupération des bagages — zone de l'aéroport'>baggage claim</span> number?",
+            fr:"Je peux vous aider ? Votre numéro de réclamation de bagage ?" },
+          { speaker:"Toi", avatar:"👤", side:"you",
+            text:"My <span class='word-key' data-word='suitcase' data-pron='/ˈsuːtkeɪs/' data-def='Valise — bagage de voyage'>suitcase</span> didn't arrive. I've been waiting for over 40 minutes. Flight from Paris, <span class='word-key' data-word='reference' data-pron='/ˈrɛfrəns/' data-def='Référence — numéro d'identification'>reference</span> AF 447.",
+            fr:"Ma valise n'est pas arrivée. J'attends depuis plus de 40 minutes. Vol depuis Paris, référence AF 447." }
+        ],
+        shadow:{ phrase:"My suitcase didn't arrive. I've been waiting for over 40 minutes.", phonetic:"/maɪ ˈsuːtkeɪs ˈdɪdnt əˈraɪv — aɪv biːn ˈweɪtɪŋ fɔːr ˈoʊvər ˈfɔːrti ˈmɪnɪts/" },
+        quiz:{ q:"Comment dis-tu \"j'attends depuis\" pour exprimer une durée ?",
+          options:["I've been waiting for...","I wait since...","I am waiting from...","I waited for..."], correct:0,
+          feedback:["✅ Exact ! \"I've been waiting for\" = present perfect continu. Parfait pour une durée qui continue.","❌ \"I wait since\" est incorrect. Le present simple ne s'utilise pas ici.","❌ \"Waiting from\" n'est pas correct. On dit \"waiting for\" ou \"since\".","❌ \"I waited\" = passé simple, implique que l'attente est terminée."] }
+      },
+      { context:"Tom tape sur son clavier. Il fronce les sourcils.",
+        dialogue:[
+          { speaker:"Agent (Tom)", avatar:"👨‍✈️", side:"them",
+            text:"I see your bag was <span class='word-key' data-word='misrouted' data-pron='/mɪsˈruːtɪd/' data-def='Mal acheminé — envoyé au mauvais endroit'>misrouted</span> to Chicago. We can <span class='word-key' data-word='deliver' data-pron='/dɪˈlɪvər/' data-def='Livrer — apporter à domicile'>deliver</span> it to your hotel within 24 hours.",
+            fr:"Je vois que votre sac a été mal acheminé vers Chicago. Nous pouvons le livrer à votre hôtel sous 24 heures." },
+          { speaker:"Toi", avatar:"👤", side:"you",
+            text:"24 hours? I need my bag <span class='word-key' data-word='tonight' data-pron='/təˈnaɪt/' data-def='Ce soir — pendant la nuit d'aujourd'hui'>tonight</span>. I have an important <span class='word-key' data-word='meeting' data-pron='/ˈmiːtɪŋ/' data-def='Réunion — rencontre professionnelle'>meeting</span> tomorrow morning.",
+            fr:"24 heures ? J'ai besoin de ma valise ce soir. J'ai une réunion importante demain matin." }
+        ],
+        shadow:{ phrase:"24 hours? I need my bag tonight. I have an important meeting tomorrow morning.", phonetic:"/ˈtwɛnti fɔːr ˈaʊərz — aɪ niːd maɪ bæɡ təˈnaɪt — aɪ hæv ən ɪmˈpɔːrtənt ˈmiːtɪŋ təˈmɒrəʊ ˈmɔːrnɪŋ/" },
+        quiz:{ q:"Comment exprimes-tu une urgence de manière professionnelle ?",
+          options:["This is urgent — I need it tonight.","Give it to me now!","I want it very fast.","This must happen quickly!"], correct:0,
+          feedback:["✅ Parfait ! Direct, poli et professionnel. \"Urgent\" est compris partout.","❌ Trop agressif pour un contexte professionnel.","❌ \"Very fast\" est trop vague et peu formel.","❌ Correct mais moins naturel que \"this is urgent\"."] }
+      },
+      { context:"Tom revient avec une mauvaise nouvelle. Il hésite avant de parler.",
+        dialogue:[
+          { speaker:"Agent (Tom)", avatar:"👨‍✈️", side:"them",
+            text:"We located your bag, but... there's a <span class='word-key' data-word='problem' data-pron='/ˈprɒbləm/' data-def='Problème — difficulté à résoudre'>problem</span>. It arrived but it was <span class='word-key' data-word='opened' data-pron='/ˈoʊpənd/' data-def='Ouvert — dont le contenu a été exposé'>opened</span>.",
+            fr:"Nous avons localisé votre sac, mais... il y a un problème. Il est arrivé mais il a été ouvert." },
+          { speaker:"Toi", avatar:"👤", side:"you",
+            text:"Opened? I want to <span class='word-key' data-word='file' data-pron='/faɪl/' data-def='Déposer (une plainte) — soumettre officiellement'>file</span> a <span class='word-key' data-word='complaint' data-pron='/kəmˈpleɪnt/' data-def='Plainte — réclamation officielle'>complaint</span> right now. Who is your <span class='word-key' data-word='supervisor' data-pron='/ˈsuːpərvaɪzər/' data-def='Superviseur — responsable hiérarchique'>supervisor</span>?",
+            fr:"Ouvert ? Je veux déposer une plainte maintenant. Qui est votre superviseur ?" }
+        ],
+        shadow:{ phrase:"I want to file a complaint right now. Who is your supervisor?", phonetic:"/aɪ wɒnt tə faɪl ə kəmˈpleɪnt raɪt naʊ — huː ɪz jɔːr ˈsuːpərvaɪzər/" },
+        quiz:{ q:"Pour déposer une plainte officielle, quelle est la phrase clé ?",
+          options:["I'd like to file a complaint.","I want to complain.","This is not acceptable!","I need to speak to someone."], correct:0,
+          feedback:["✅ Parfait ! \"File a complaint\" est le terme officiel et reconnu partout.","❌ Correct mais moins formel. \"File a complaint\" est plus professionnel.","❌ Exprimer sa frustration, mais pas une démarche officielle.","❌ Utile mais incomplet. Précise que tu veux \"file a complaint\"."] }
+      }
+    ], locked:false },
+  { id:6, title:"Saturday", genre:"romance", genreLabel:"ROMANCE", emoji:"💕", location:"CENTRAL PARK — NYC", xp:160, words:"12 phrases clés", desc:"Le rendez-vous avec Maya. Un pique-nique, une révélation.", cliffhanger:"Elle dit : \"I know who you are. And I know what you saw at the conference.\"", cfIcon:"💕", steps:[
+      { context:"Central Park, samedi après-midi. Maya arrive avec un sac pique-nique. Elle sourit mais son regard est sérieux.",
+        dialogue:[
+          { speaker:"Maya", avatar:"👩", side:"them",
+            text:"I'm glad you came. I have to <span class='word-key' data-word='confess' data-pron='/kənˈfɛs/' data-def='Confesser — admettre quelque chose de caché'>confess</span> something. I'm not just a <span class='word-key' data-word='barista' data-pron='/bəˈriːstə/' data-def='Barista — personne qui prépare le café'>barista</span>.",
+            fr:"Je suis contente que tu sois venu. Je dois t'avouer quelque chose. Je ne suis pas juste barista." },
+          { speaker:"Toi", avatar:"👤", side:"you",
+            text:"What do you mean? Who are you <span class='word-key' data-word='really' data-pron='/ˈrɪəli/' data-def='Vraiment — en réalité, pour de vrai'>really</span>?",
+            fr:"Que veux-tu dire ? Qui es-tu vraiment ?" }
+        ],
+        shadow:{ phrase:"What do you mean? Who are you really?", phonetic:"/wɒt duː juː miːn — huː ɑːr juː ˈrɪəli/" },
+        quiz:{ q:"Maya dit \"I have to confess something.\" Que signifie \"confess\" ?",
+          options:["Avouer, admettre quelque chose","Demander quelque chose","Expliquer quelque chose","Cacher quelque chose"], correct:0,
+          feedback:["✅ Exact ! \"Confess\" = avouer, admettre. Souvent utilisé pour des révélations importantes.","❌ \"Ask\" = demander.","❌ \"Explain\" = expliquer.","❌ Le contraire ! \"Confess\" = révéler, pas cacher."] }
+      },
+      { context:"Maya sort une carte de visite. FBI Special Agent. Tu restes muet.",
+        dialogue:[
+          { speaker:"Maya", avatar:"👩‍💼", side:"them",
+            text:"I've been <span class='word-key' data-word='undercover' data-pron='/ˌʌndəˈkʌvər/' data-def='Undercover — agent infiltré, travaille en secret'>undercover</span> for 8 months. The man in your hotel room — he's the one we've been <span class='word-key' data-word='tracking' data-pron='/ˈtræktɪŋ/' data-def='Pistant — suivant les mouvements de quelqu'un'>tracking</span>.",
+            fr:"J'ai été infiltrée pendant 8 mois. L'homme dans ta chambre d'hôtel — c'est celui qu'on traquait." },
+          { speaker:"Toi", avatar:"👤", side:"you",
+            text:"You've been <span class='word-key' data-word='watching' data-pron='/ˈwɒtʃɪŋ/' data-def='Surveillant — observant discrètement'>watching</span> me this whole time? I need a minute to <span class='word-key' data-word='process' data-pron='/ˈprəʊsɛs/' data-def='Digérer — comprendre et accepter une information'>process</span> this.",
+            fr:"Tu me surveillais depuis le début ? J'ai besoin d'une minute pour digérer ça." }
+        ],
+        shadow:{ phrase:"You've been watching me this whole time? I need a minute to process this.", phonetic:"/juːv biːn ˈwɒtʃɪŋ miː ðɪs hoʊl taɪm — aɪ niːd ə ˈmɪnɪt tə ˈprəʊsɛs ðɪs/" },
+        quiz:{ q:"Comment dis-tu \"j'ai besoin d'un moment\" naturellement en anglais ?",
+          options:["I need a minute.","Give me some time.","I want a moment.","Let me have time."], correct:0,
+          feedback:["✅ Parfait ! \"I need a minute\" est l'expression la plus naturelle et directe.","❌ Correct mais moins précis que \"I need a minute\".","❌ \"I want\" sonne moins urgent que \"I need\".","❌ Peu naturel. \"I need a minute\" est bien meilleur."] }
+      },
+      { context:"Maya s'approche. Son ton change. Elle baisse la voix.",
+        dialogue:[
+          { speaker:"Maya", avatar:"👩‍💼", side:"them",
+            text:"We need you to <span class='word-key' data-word='testify' data-pron='/ˈtɛstɪfaɪ/' data-def='Témoigner — déclarer sous serment ce qu'on a vu'>testify</span>. What you saw at the conference is the key <span class='word-key' data-word='evidence' data-pron='/ˈɛvɪdəns/' data-def='Preuve — élément qui confirme un fait'>evidence</span>.",
+            fr:"Nous avons besoin que tu témoignes. Ce que tu as vu à la conférence est la preuve clé." },
+          { speaker:"Toi", avatar:"👤", side:"you",
+            text:"And if I say yes — what happens to me? Am I <span class='word-key' data-word='safe' data-pron='/seɪf/' data-def='En sécurité — hors de danger'>safe</span>?",
+            fr:"Et si je dis oui — qu'est-ce qui m'arrive ? Suis-je en sécurité ?" }
+        ],
+        shadow:{ phrase:"And if I say yes — what happens to me? Am I safe?", phonetic:"/ænd ɪf aɪ seɪ jɛs — wɒt ˈhæpənz tə miː — æm aɪ seɪf/" },
+        quiz:{ q:"Comment demandes-tu si tu es en sécurité ?",
+          options:["Am I safe?","Is it safe for me?","Will I be in safety?","Am I protected?"], correct:0,
+          feedback:["✅ Parfait ! \"Am I safe?\" est simple, direct et très naturel.","❌ Correct mais plus lourd. \"Am I safe?\" est plus courant.","❌ \"In safety\" n'est pas idiomatique. On dit \"safe\" ou \"in a safe place\".","❌ Correct mais \"Am I safe?\" est plus immédiat et naturel."] }
+      }
+    ], locked:false },
+];
+
+const LEADERBOARD = [
+  { rank:1, flag:"🇧🇷", name:"Carlos M.", xp:4820, streak:21 },
+  { rank:2, flag:"🇲🇦", name:"Yasmine K.", xp:4310, streak:18 },
+  { rank:3, flag:"🇨🇮", name:"Kofi A.", xp:3990, streak:14 },
+  { rank:4, flag:"🇳🇬", name:"Amara T.", xp:3200, streak:11 },
+  { rank:5, flag:"🇸🇳", name:"Fatou D.", xp:2850, streak:9 },
+  { rank:6, flag:"🇩🇿", name:"Karim B.", xp:2100, streak:7 },
+  { rank:-1, flag:"👤", name:"Toi", xp:0, streak:1, isMe:true },
+];
+
+// ══════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display='none'; });
+  const t = document.getElementById('screen-'+name);
+  if (t) { t.classList.add('active'); t.style.display = name==='splash' ? 'flex' : 'block'; }
+
+  hideActionBar();
+  const nav = document.getElementById('bottom-nav');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+  if (name==='splash') { if(nav) nav.style.display='none'; }
+  else {
+    if(nav) nav.style.display='flex';
+    if(name==='episodes') { document.getElementById('nav-home')?.classList.add('active'); renderEpisodes(); updateXPDisplay(); }
+    if(name==='leaderboard') { document.getElementById('nav-lb')?.classList.add('active'); renderLeaderboard(); updateXPDisplay(); }
+  }
+  scrollToTop();
+}
+
+function scrollToTop() {
+  window.scrollTo(0,0);
+  document.documentElement.scrollTop=0;
+  document.body.scrollTop=0;
+  const s = document.getElementById('phone-shell');
+  if(s) s.scrollTop=0;
+}
+
+// ── STICKY ACTION BAR ──
+function showActionBar(label, callback, pulse=true) {
+  const bar = document.getElementById('sticky-bar');
+  const btn = document.getElementById('btn-action');
+  btn.textContent = label;
+  state.actionCallback = callback;
+  if(pulse) btn.classList.add('pulsing'); else btn.classList.remove('pulsing');
+  bar.classList.add('show');
+}
+function hideActionBar() {
+  document.getElementById('sticky-bar')?.classList.remove('show');
+  state.actionCallback = null;
+}
+function handleAction() {
+  if (state.actionCallback) state.actionCallback();
+}
+
+// ══════════════════════════════════
+// EPISODES RENDER
+// ══════════════════════════════════
+function renderEpisodes() {
+  const list = document.getElementById('episodes-list');
+  list.innerHTML = '';
+  EPISODES.forEach((ep, i) => {
+    const isCompleted = state.completedEps.includes(ep.id);
+    const isLocked = ep.locked && i > 2;
+    const isActive = !isLocked && !isCompleted && i === getNextEpIdx();
+
+    const card = document.createElement('div');
+    card.className = `ep-card${isCompleted?' completed':''}${isActive?' active-ep':''}${isLocked?' locked':''}`;
+
+    const playIcon = isCompleted ? '✅' : isLocked ? '🔒' : '▶';
+    const tagClass = `tag-${ep.genre}`;
+    const barClass = `genre-${ep.genre}`;
+
+    card.innerHTML = `
+      <div class="ep-genre-bar ${barClass}"></div>
+      <div class="ep-inner">
+        <div class="ep-emoji">${ep.emoji}</div>
+        <div class="ep-content">
+          <div class="ep-genre-tag ${tagClass}">${ep.genreLabel}</div>
+          <div class="ep-title">${ep.title}</div>
+          <div class="ep-desc">${ep.desc}</div>
+          <div class="ep-meta">
+            <div class="ep-xp">+${ep.xp} XP</div>
+            <div class="ep-words">${ep.words}</div>
+            ${isCompleted ? '<span style="font-size:0.7rem;color:var(--green)">✅ Complété</span>' : ''}
+          </div>
+        </div>
+        <button class="ep-play-btn" tabindex="-1">${playIcon}</button>
+      </div>
+    `;
+    if (!isLocked) card.addEventListener('click', () => startEpisode(ep.id));
+    list.appendChild(card);
+  });
+}
+
+function getNextEpIdx() {
+  for (let i=0; i<EPISODES.length; i++) if (!state.completedEps.includes(EPISODES[i].id)) return i;
+  return EPISODES.length-1;
+}
+
+// ══════════════════════════════════
+// PLAYER — step-based, no scroll
+// ══════════════════════════════════
+function startEpisode(epId) {
+  const ep = EPISODES.find(e => e.id===epId);
+  if (!ep?.steps?.length) { alert('🔒 Complète les épisodes précédents d\'abord !'); return; }
+  state.currentEp = epId; state.currentStep = 0;
+  state.quizAnswered = false; state.repeatCounts = {};
+  showScreen('player');
+  buildProgressTrack();
+  renderSection('scene');
+}
+
+function buildProgressTrack() {
+  const ep = EPISODES.find(e => e.id===state.currentEp);
+  const track = document.getElementById('progress-track');
+  track.innerHTML = ep.steps.map((_,i) => `<div class="progress-step" id="ps-${i}"></div>`).join('');
+  updateProgressTrack();
+}
+
+function updateProgressTrack() {
+  const ep = EPISODES.find(e => e.id===state.currentEp);
+  ep.steps.forEach((_,i) => {
+    const el = document.getElementById(`ps-${i}`);
+    if(el) el.className = 'progress-step' + (i<state.currentStep?' done': i===state.currentStep?' current':'');
+  });
+}
+
+/* ── Section rendering ──
+   Sections per step: 'scene' → 'shadow' → 'quiz' → next step or 'done'
+*/
+function renderSection(section) {
+  state.playerSection = section;
+  const ep = EPISODES.find(e => e.id===state.currentEp);
+  const step = ep.steps[state.currentStep];
+  const panel = document.getElementById('step-panel');
+  hideActionBar();
+
+  if (section === 'scene') {
+    // Show context + dialogue, offer [Lire] and [▶ Écouter maintenant]
+    const dlgHTML = step.dialogue.map(l => `
+      <div class="dlg-line ${l.side}">
+        <div class="dlg-avatar">${l.avatar}</div>
+        <div class="bubble ${l.side}">
+          <div class="spk-name">${l.speaker}</div>
+          <div class="line-en">${l.text}</div>
+          <div class="line-fr">${l.fr}</div>
+        </div>
+      </div>`).join('');
+
+    panel.innerHTML = `
+      <div class="ep-header-mini">
+        <span class="ep-header-pill pill-${ep.genre}">${ep.genreLabel}</span>
+        <span class="ep-header-title">${ep.emoji} ${ep.title}</span>
+      </div>
+      <div class="scene-card-mini">
+        <div class="scene-loc">${ep.emoji} ${ep.location}</div>
+        <div class="scene-ctx">${step.context}</div>
+      </div>
+      <div class="dialogue-block">${dlgHTML}</div>
+      <div class="section-actions">
+        <div class="dual-btns">
+          <button class="btn-secondary" onclick="renderSection('scene')">📖 Relire</button>
+          <button class="btn-action-full pulsing" onclick="renderSection('shadow')">🎙 Écouter →</button>
+        </div>
+      </div>
+    `;
+    attachTooltips();
+
+  } else if (section === 'shadow') {
+    const reps = state.repeatCounts[state.currentStep] || 0;
+    const dots = [0,1,2].map(i=>`<div class="rep-dot${i<reps?' filled':''}${i===2&&reps>=3?' gold':''}" id="dot-${i}"></div>`).join('');
+    panel.innerHTML = `
+      <div class="shadow-box">
+        <div class="shadow-label">🎙 SHADOWING — Répète à voix haute</div>
+        <div class="shadow-phrase" id="current-phrase">"${step.shadow.phrase}"</div>
+        <div class="shadow-phonetic">${step.shadow.phonetic}</div>
+        <div class="shadow-controls">
+          <button class="btn-listen pulsing" id="btn-listen" onclick="playCurrentAudio()">▶ Écouter</button>
+          <button class="btn-record" id="btn-record" onclick="toggleRecord()">🎙 Je répète</button>
+        </div>
+        <div class="transcript-box" id="transcript-box"></div>
+        <div class="score-card" id="score-card">
+          <div class="score-bar-wrap">
+            <div class="score-row">
+              <div class="score-label-txt">Prononciation</div>
+              <div class="score-num" id="score-num">—</div>
+            </div>
+            <div class="score-track"><div class="score-fill" id="score-fill"></div></div>
+          </div>
+          <div class="score-feedback">
+            <div class="score-feedback-text" id="score-feedback-text"></div>
+            <div class="word-diff" id="word-diff"></div>
+            <button class="retry-btn" id="retry-btn" onclick="retryRecord()">🔄 Réessayer</button>
+          </div>
+        </div>
+        <div class="rep-counter">${dots}<span class="rep-label" id="rep-label">${reps}/3 répétitions</span></div>
+      </div>
+      <div class="section-actions">
+        <div class="dual-btns">
+          <button class="btn-secondary" onclick="renderSection('scene')">← Dialogue</button>
+          <button class="btn-action-full" id="goto-quiz-btn" onclick="renderSection('quiz')" style="opacity:${reps>=1?1:0.4};pointer-events:${reps>=1?'auto':'none'}">Quiz →</button>
+        </div>
+      </div>
+    `;
+    // Auto-play on entering shadow section
+    setTimeout(() => playCurrentAudio(), 400);
+    // After listen, the record button starts pulsing
+    setTimeout(() => {
+      const br = document.getElementById('btn-record');
+      if(br) br.classList.add('pulsing');
+      const bl = document.getElementById('btn-listen');
+      if(bl) bl.classList.remove('pulsing');
+    }, 2500);
+
+  } else if (section === 'quiz') {
+    const opts = step.quiz.options.map((o,i) => `<button class="quiz-opt" onclick="answerQuiz(${i})">${o}</button>`).join('');
+    panel.innerHTML = `
+      <div class="quiz-box">
+        <div class="quiz-label">🎯 MINI TEST</div>
+        <div class="quiz-q">${step.quiz.q}</div>
+        <div class="quiz-options">${opts}</div>
+        <div class="quiz-feedback" id="quiz-feedback"></div>
+      </div>
+      <div class="section-actions">
+        <button class="btn-secondary" onclick="renderSection('shadow')" style="width:100%;margin-top:0.6rem;">← Shadowing</button>
+      </div>
+    `;
+
+  } else if (section === 'complete_step') {
+    // Advance to next step or complete episode
+    const ep2 = EPISODES.find(e => e.id===state.currentEp);
+    const next = state.currentStep + 1;
+    if (next < ep2.steps.length) {
+      state.currentStep = next;
+      state.quizAnswered = false;
+      updateProgressTrack();
+      renderSection('scene');
+      scrollToTop();
+    } else {
+      completeEpisode(ep2);
+    }
+  }
+}
+
+function attachTooltips() {
+  document.querySelectorAll('.word-key').forEach(el => {
+    el.addEventListener('click', e => {
+      const tt = document.getElementById('tooltip');
+      document.getElementById('tt-word').textContent = el.dataset.word;
+      document.getElementById('tt-pron').textContent = el.dataset.pron;
+      document.getElementById('tt-def').textContent = el.dataset.def;
+      tt.style.left = Math.min(e.clientX, window.innerWidth-210)+'px';
+      tt.style.top = Math.max(e.clientY-110, 10)+'px';
+      tt.classList.add('show');
+      setTimeout(() => tt.classList.remove('show'), 3000);
+    });
+  });
+}
+
+// ══════════════════════════════════
+// RECORDING — mobile-first
+// ══════════════════════════════════
+let recognition=null, isRecording=false, _recStopped=false;
+
+function playCurrentAudio() {
+  const el = document.getElementById('current-phrase');
+  const text = el ? el.textContent.replace(/["""«»]/g,'').trim() : '';
+  playAudio(text);
+  setTimeout(() => {
+    const br = document.getElementById('btn-record');
+    if(br && !isRecording) br.classList.add('pulsing');
+  }, 1800);
+}
+
+function toggleRecord() {
+  if (isRecording) _forceStop(); else startRecording();
+}
+
+function _forceStop() {
+  _recStopped = true;
+  isRecording = false;
+  if (recognition) { try { recognition.stop(); } catch(_){} recognition = null; }
+  const btn = document.getElementById('btn-record');
+  if(btn) { btn.classList.remove('recording'); btn.textContent='🎙 Je répète'; btn.disabled=false; btn.classList.add('pulsing'); }
+  const tb = document.getElementById('transcript-box');
+  if(tb) { tb.textContent='⏹ Arrêté. Réessaie.'; tb.classList.remove('listening'); }
+}
+
+function retryRecord() {
+  _recStopped = false;
+  const sc = document.getElementById('score-card');
+  const tb = document.getElementById('transcript-box');
+  const br = document.getElementById('btn-record');
+  if(sc) sc.classList.remove('show');
+  if(tb) { tb.classList.remove('show'); tb.textContent=''; }
+  if(br) { br.disabled=false; br.textContent='🎙 Je répète'; br.classList.add('pulsing'); }
+}
+
+function startRecording() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { simulateRecording(); return; }
+
+  _recStopped = false;
+  isRecording = true;
+
+  const btn = document.getElementById('btn-record');
+  if(btn) { btn.classList.add('recording'); btn.classList.remove('pulsing'); btn.textContent='⏹ Stop'; }
+  const tb = document.getElementById('transcript-box');
+  if(tb) { tb.textContent='🎤 Je t\'écoute…'; tb.className='transcript-box show listening'; }
+
+  recognition = new SR();
+  recognition.lang = 'en-US';
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 1;
+
+  let finalTranscript = '';
+
+  recognition.onresult = e => {
+    if (_recStopped) return;
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript + ' ';
+      else interim += e.results[i][0].transcript;
+    }
+    if(tb) tb.textContent = '"' + (finalTranscript || interim).trim() + '"';
+  };
+
+  recognition.onerror = e => {
+    if (_recStopped) return;
+    _recStopped = true;
+    isRecording = false;
+    recognition = null;
+
+    const b = document.getElementById('btn-record');
+    if(b) { b.classList.remove('recording'); b.textContent='🎙 Je répète'; b.disabled=false; b.classList.add('pulsing'); }
+    if(tb) tb.classList.remove('listening');
+
+    const isLocal = location.protocol==='file:' || location.href.startsWith('content:');
+    const isHTTP = location.protocol==='http:' && location.hostname!=='localhost';
+    let msg;
+    switch(e.error) {
+      case 'not-allowed':
+      case 'service-not-allowed':
+        if (isLocal) msg='🔒 Fichier local détecté. Le micro nécessite HTTPS. Ouvre ce fichier via un serveur (Netlify, etc.)';
+        else if (isHTTP) msg='🔒 HTTPS requis pour le micro. Accède à l\'app en https://';
+        else msg='🔒 Micro refusé. Sur Android : Paramètres → Apps → Chrome → Autorisations → Micro → Autoriser.';
+        break;
+      case 'no-speech': msg='🔇 Rien entendu. Rapproche-toi du téléphone et réessaie.'; break;
+      case 'network':   msg='📡 Erreur réseau. La reconnaissance vocale nécessite internet.'; break;
+      case 'audio-capture': msg='🎙 Micro introuvable ou occupé par une autre app.'; break;
+      default: msg='⚠️ Erreur (' + e.error + '). Réessaie.';
+    }
+    if(tb) { tb.textContent=msg; tb.className='transcript-box show'; }
+  };
+
+  recognition.onend = () => {
+    // Only process if not already stopped by onerror or manual stop
+    if (_recStopped) return;
+    _recStopped = true;
+    isRecording = false;
+    recognition = null;
+
+    const b = document.getElementById('btn-record');
+    if(b) { b.classList.remove('recording'); b.textContent='🎙 Je répète'; }
+
+    const trimmed = finalTranscript.trim();
+    if (!trimmed || trimmed.length < 2) {
+      if(tb) tb.textContent = '❌ Rien capté. Parle plus fort et réessaie.';
+      if(b) { b.disabled=false; b.classList.add('pulsing'); }
+      return;
+    }
+    if(tb) tb.textContent = '🔍 Analyse en cours…';
+    analyzeWithClaude(trimmed);
+  };
+
+  // Timeout safety: stop after 10s regardless
+  setTimeout(() => {
+    if (!_recStopped && isRecording) {
+      try { recognition && recognition.stop(); } catch(_) {}
+    }
+  }, 10000);
+
+  try { recognition.start(); }
+  catch(e) {
+    _recStopped=true; isRecording=false; recognition=null;
+    if(btn) { btn.classList.remove('recording'); btn.textContent='🎙 Je répète'; btn.disabled=false; btn.classList.add('pulsing'); }
+    if(tb) tb.textContent='⚠️ Impossible de démarrer le micro. Autorise le micro dans les paramètres du navigateur.';
+  }
+}
+
+function simulateRecording() {
+  _recStopped = false;
+  isRecording = true;
+  const btn = document.getElementById('btn-record');
+  if(btn){ btn.classList.add('recording'); btn.classList.remove('pulsing'); btn.textContent='⏹ Stop (sim)'; }
+  const tb = document.getElementById('transcript-box');
+  if(tb){ tb.textContent='🎤 Simulation…'; tb.className='transcript-box show listening'; }
+  setTimeout(() => {
+    if (_recStopped) return;
+    _recStopped = true;
+    isRecording = false;
+    if(btn){ btn.classList.remove('recording'); btn.textContent='🎙 Je répète'; btn.disabled=true; }
+    const el = document.getElementById('current-phrase');
+    const phrase = el ? el.textContent.replace(/["""«»]/g,'').trim() : '';
+    if(tb){ tb.textContent='"'+phrase+'"'; tb.classList.remove('listening'); }
+    analyzeWithClaude(phrase);
+  }, 2500);
+}
+
+async function analyzeWithClaude(transcript) {
+  const el=document.getElementById('current-phrase');
+  const target=el?el.textContent.replace(/["""]/g,'').trim():'';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:400,
+        system:`Tu es un coach de prononciation anglaise pour apprenants francophones.
+Réponds UNIQUEMENT en JSON valide, sans markdown:
+{"score":85,"level":"good","feedback":"Très bien !","correct_words":["word1"],"wrong_words":["word3"],"missing_words":["word4"],"passed":true}
+Niveaux: "excellent"(90-100),"good"(70-89),"ok"(50-69),"retry"(0-49). passed=true si score>=60.`,
+        messages:[{role:'user',content:`Phrase cible: "${target}"\nDit: "${transcript}"\nDonne le score.`}] })
+    });
+    const data=await res.json();
+    const result=JSON.parse(data.content[0].text.trim());
+    showScore(result, transcript);
+  } catch(err) {
+    showScore(localScore(transcript, target), transcript);
+  }
+}
+
+function localScore(transcript, target) {
+  const t=transcript.toLowerCase().replace(/[^a-z\s]/g,'').split(' ').filter(Boolean);
+  const tgt=target.toLowerCase().replace(/[^a-z\s]/g,'').split(' ').filter(Boolean);
+  let correct=0; const correct_words=[],wrong_words=[],missing_words=[];
+  tgt.forEach(w=>{ if(t.includes(w)){correct++;correct_words.push(w);}else missing_words.push(w); });
+  t.forEach(w=>{ if(!tgt.includes(w)) wrong_words.push(w); });
+  const score=Math.round((correct/Math.max(tgt.length,1))*100);
+  const level=score>=90?'excellent':score>=70?'good':score>=50?'ok':'retry';
+  const msgs={excellent:'Parfait ! Prononciation excellente !',good:'Très bien ! Quelques petits ajustements.',ok:'Pas mal ! Concentre-toi sur les mots manquants.',retry:'Courage ! Écoute bien et réessaie doucement.'};
+  return {score,level,feedback:msgs[level],correct_words,wrong_words,missing_words,passed:score>=60};
+}
+
+function showScore(result, transcript) {
+  const tb=document.getElementById('transcript-box');
+  if(tb) tb.textContent='"'+transcript+'"';
+
+  const sc=document.getElementById('score-card');
+  if(!sc) return;
+  sc.classList.add('show');
+
+  const sn=document.getElementById('score-num');
+  if(sn){ sn.textContent=result.score+'%'; sn.className='score-num '+result.level; }
+  const sf=document.getElementById('score-fill');
+  if(sf){ sf.className='score-fill '+result.level; setTimeout(()=>{sf.style.width=result.score+'%';},50); }
+  const sft=document.getElementById('score-feedback-text');
+  if(sft) sft.textContent=result.feedback;
+
+  const wd=document.getElementById('word-diff');
+  if(wd){
+    wd.innerHTML='';
+    (result.correct_words||[]).forEach(w=>{ wd.innerHTML+=`<span class="wd correct">✓ ${w}</span>`; });
+    (result.wrong_words||[]).forEach(w=>{ wd.innerHTML+=`<span class="wd wrong">✗ ${w}</span>`; });
+    (result.missing_words||[]).forEach(w=>{ wd.innerHTML+=`<span class="wd missing">? ${w}</span>`; });
+  }
+
+  const rb=document.getElementById('retry-btn');
+  if(result.passed) {
+    if(rb) rb.style.display='none';
+    setTimeout(()=>markRepeat(result.score), 400);
+  } else {
+    if(rb) rb.style.display='block';
+    const br=document.getElementById('btn-record');
+    if(br) br.disabled=false;
+  }
+}
+
+function markRepeat(score) {
+  const count = (state.repeatCounts[state.currentStep] || 0) + 1;
+  state.repeatCounts[state.currentStep] = count;
+
+  // Update dots
+  const dot = document.getElementById('dot-' + Math.min(count-1, 2));
+  if(dot) { dot.classList.add('filled'); if(count >= 3) dot.classList.add('gold'); }
+  const lbl = document.getElementById('rep-label');
+  if(lbl) lbl.textContent = count + '/3 répétitions';
+
+  // XP per rep
+  gainXP(score >= 90 ? 10 : 5);
+  if (count >= 3) gainXP(score >= 90 ? 20 : 10);
+
+  // Unlock + pulse the Quiz button
+  const gq = document.getElementById('goto-quiz-btn');
+  if(gq) { gq.style.opacity='1'; gq.style.pointerEvents='auto'; gq.classList.add('pulsing'); }
+
+  if (count >= 3) {
+    // All reps done — push quiz via sticky bar
+    showActionBar('🎯 Faire le Quiz →', () => renderSection('quiz'), true);
+  } else {
+    // More reps possible — auto-reset after 2s for next attempt
+    setTimeout(() => {
+      if (document.getElementById('score-card')) {
+        const sc = document.getElementById('score-card');
+        const tb = document.getElementById('transcript-box');
+        const br = document.getElementById('btn-record');
+        if(sc) sc.classList.remove('show');
+        if(tb) { tb.classList.remove('show'); tb.textContent=''; }
+        if(br) {
+          br.disabled = false;
+          br.textContent = '🎙 Je répète';
+          br.classList.add('pulsing');
+        }
+        _recStopped = false;
+      }
+    }, 2000);
+  }
+}
+
+// ══════════════════════════════════
+// QUIZ
+// ══════════════════════════════════
+function answerQuiz(idx) {
+  if(state.quizAnswered) return;
+  state.quizAnswered = true;
+  const ep=EPISODES.find(e=>e.id===state.currentEp);
+  const step=ep.steps[state.currentStep];
+  const correct=step.quiz.correct;
+  document.querySelectorAll('.quiz-opt').forEach((o,i)=>{
+    o.disabled=true;
+    if(i===correct) o.classList.add('correct');
+    else if(i===idx&&idx!==correct) o.classList.add('wrong');
+  });
+  const fb=document.getElementById('quiz-feedback');
+  if(fb){ fb.textContent=step.quiz.feedback[idx]; fb.className='quiz-feedback show '+(idx===correct?'feedback-correct':'feedback-wrong'); }
+  if(idx===correct) gainXP(30);
+
+  // Show sticky action bar to advance
+  setTimeout(()=>{
+    showActionBar('CONTINUER →', ()=>renderSection('complete_step'), true);
+  }, 600);
+}
+
+// ══════════════════════════════════
+// EPISODE COMPLETE
+// ══════════════════════════════════
+function completeEpisode(ep) {
+  if(!state.completedEps.includes(ep.id)){
+    state.completedEps.push(ep.id); saveState();
+    gainXP(ep.xp);
+    state.streak = Math.min(state.streak+1,99);
+  }
+  const panel=document.getElementById('step-panel');
+  panel.innerHTML = `
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;animation:fadeUp 0.5s ease;padding:1.5rem;">
+      <div style="font-size:3.5rem;margin-bottom:1rem;">🎉</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.6rem;letter-spacing:1.5px;color:var(--accent1);">ÉPISODE COMPLÉTÉ !</div>
+      <div style="color:var(--text2);margin-top:0.4rem;font-size:0.88rem;">+${ep.xp} XP gagnés</div>
+    </div>
+    <div class="cliff-card show" style="flex-shrink:0;margin-bottom:1rem;">
+      <div class="cliff-icon">${ep.cfIcon}</div>
+      <div class="cliff-label">À SUIVRE…</div>
+      <div class="cliff-text">"${ep.cliffhanger}"</div>
+      <div class="cliff-sub">Complète l'épisode suivant pour connaître la suite.</div>
+    </div>
+  `;
+  showActionBar('← Retour aux épisodes', ()=>showScreen('episodes'), false);
+  // Mark all progress steps done
+  document.querySelectorAll('.progress-step').forEach(s=>s.className='progress-step done');
+}
+
+// ══════════════════════════════════
+// XP + STREAK
+// ══════════════════════════════════
+function gainXP(amt) {
+  state.xp += amt;
+  updateXPDisplay();
+  showXPPopup(`+${amt} XP`);
+  updateLeaderboardMe();
+}
+function updateXPDisplay() {
+  ['ep-xp-val','pl-xp-val','lb-xp-val'].forEach(id=>{ const e=document.getElementById(id); if(e) e.textContent=state.xp; });
+  ['ep-streak','pl-streak','lb-streak'].forEach(id=>{ const e=document.getElementById(id); if(e) e.textContent=`🔥 ${state.streak}j`; });
+}
+function showXPPopup(msg) {
+  const p=document.getElementById('xp-popup');
+  p.textContent=msg; p.classList.add('show');
+  setTimeout(()=>p.classList.remove('show'),2000);
+}
+function updateLeaderboardMe() {
+  const me=LEADERBOARD.find(p=>p.isMe);
+  if(me){ me.xp=state.xp; me.streak=state.streak; }
+  LEADERBOARD.sort((a,b)=>b.xp-a.xp);
+  const idx=LEADERBOARD.findIndex(p=>p.isMe);
+  if(me) me.rank=idx+1;
+}
+
+// ══════════════════════════════════
+// LEADERBOARD
+// ══════════════════════════════════
+function renderLeaderboard() {
+  updateLeaderboardMe();
+  const me=LEADERBOARD.find(p=>p.isMe);
+  document.getElementById('my-rank-num').textContent = me.rank<0?'—':'#'+me.rank;
+  const nameEl = document.getElementById('my-rank-name');
+  if (nameEl && fbPlayerData.name) nameEl.textContent = fbPlayerData.name;
+  document.getElementById('my-rank-xp').textContent = me.xp+' XP';
+  document.getElementById('my-rank-streak').textContent = `🔥 ${me.streak} jours`;
+  const list=document.getElementById('lb-full-list');
+  list.innerHTML='';
+  LEADERBOARD.forEach((pl,i)=>{
+    const rk=i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
+    const rkCls=i===0?'top1':i===1?'top2':i===2?'top3':'';
+    const it=document.createElement('div');
+    it.className=`lb-item${pl.isMe?' me':''}`;
+    it.innerHTML=`
+      <div class="lb-item-rank ${rkCls}">${rk}</div>
+      <div class="lb-item-avatar">${pl.flag}</div>
+      <div class="lb-item-name">${pl.name}${pl.isMe?' <span style="font-size:0.68rem;color:var(--accent1)">(toi)</span>':''}</div>
+      <div class="lb-item-right">
+        <div class="lb-item-xp">${pl.xp.toLocaleString()} XP</div>
+        <div class="lb-item-streak">🔥 ${pl.streak}j</div>
+      </div>`;
+    list.appendChild(it);
+  });
+}
+
+// ══════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════
+let notifEnabled=false, notifTime='08:00', notifTimer=null;
+
+function buildVoiceGrid() {
+  const grid = document.getElementById('voice-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const hasKey = elApiKey && elApiKey.length > 10;
+
+  VOICE_DEFS.forEach(def => {
+    const card = document.createElement('div');
+    card.className = 'voice-card' + (state.selectedVoice === def.id ? ' selected' : '');
+
+    const isMale = def.wsPitch < 1.0;
+    const qualityBadge = hasKey
+      ? `<span style="font-size:0.52rem;background:rgba(0,230,118,0.15);color:var(--green);border:1px solid rgba(0,230,118,0.3);border-radius:4px;padding:0.08rem 0.35rem;font-weight:700;">ELEVENLABS</span>`
+      : `<span style="font-size:0.52rem;background:rgba(255,152,0,0.12);color:var(--orange);border:1px solid rgba(255,152,0,0.3);border-radius:4px;padding:0.08rem 0.35rem;font-weight:700;">NAVIGATEUR</span>`;
+
+    card.innerHTML = `
+      <div class="voice-card-check">✓</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.3rem;">
+        <span style="font-size:1.25rem;">${def.flag}</span>
+        <button onclick="event.stopPropagation();testVoice('${def.id}')"
+          style="font-size:0.58rem;padding:0.2rem 0.5rem;border-radius:6px;
+                 border:1px solid var(--accent2);background:transparent;
+                 color:var(--accent2);cursor:pointer;font-family:'Inter',sans-serif;font-weight:700;">
+          ▶ TESTER
+        </button>
+      </div>
+      <div class="voice-card-name">${def.name}</div>
+      <div class="voice-card-accent">${def.accent} · ${isMale ? '♂' : '♀'}</div>
+      <div style="margin-top:0.4rem;">${qualityBadge}</div>
+      <div style="font-size:0.56rem;color:var(--muted);margin-top:0.25rem;font-family:'JetBrains Mono',monospace;">
+        ${hasKey ? def.elName : (isMale ? 'pitch 0.5' : 'pitch 1.1')}
+      </div>
+    `;
+    card.addEventListener('click', () => selectVoice(def.id));
+    grid.appendChild(card);
+  });
+}
+
+function testVoice(id) {
+  const prev = state.selectedVoice;
+  state.selectedVoice = id;
+  const def = VOICE_DEFS.find(d => d.id === id);
+  const isMale = def && def.wsPitch < 1.0;
+  const phrase = isMale
+    ? "Hello, I'm your coach. Let's practice English together."
+    : "Hi there! Ready to learn? Let's get started!";
+  playAudio(phrase);
+  state.selectedVoice = prev;
+}
+
+function selectVoice(id) {
+  state.selectedVoice = id;
+  buildVoiceGrid();
+  testVoice(id);
+}
+
+function saveElKey() {
+  const input = document.getElementById('el-api-key');
+  if (!input) return;
+  elApiKey = input.value.trim();
+  _audioCache = {}; // clear cache on key change
+  localStorage.setItem('el_api_key', elApiKey);
+  updateElKeyStatus();
+  buildVoiceGrid();
+  if (elApiKey.length > 10) {
+    // Quick test
+    testVoice(state.selectedVoice);
+  }
+}
+
+function updateElKeyStatus() {
+  const input = document.getElementById('el-api-key');
+  const status = document.getElementById('el-key-status');
+  if (!input || !status) return;
+  const val = input.value.trim();
+  if (!val) {
+    status.textContent = '⚠️ Sans clé : voix navigateur utilisée (qualité limitée sur mobile).';
+    status.style.color = 'var(--orange)';
+  } else if (val.length < 10) {
+    status.textContent = '❌ Clé invalide.';
+    status.style.color = 'var(--accent1)';
+  } else {
+    status.textContent = '✅ Clé ElevenLabs active — voix professionnelles activées.';
+    status.style.color = 'var(--green)';
+  }
+  status.style.display = 'block';
+}
+
+function openSettings() {
+  updateSettingsProfile();
+  // Load saved API key
+  const saved = localStorage.getItem('el_api_key') || '';
+  if (saved) elApiKey = saved;
+  const keyInput = document.getElementById('el-api-key');
+  if (keyInput) keyInput.value = saved;
+
+  buildVoiceGrid();
+  updateElKeyStatus();
+  applyTheme();
+  const t = document.getElementById('notif-track');
+  if (t) t.className = 'toggle-track' + (notifEnabled ? ' on' : '');
+  const p = document.getElementById('time-picker');
+  if (p) p.style.display = notifEnabled ? 'block' : 'none';
+  const ni = document.getElementById('notif-time');
+  if (ni) ni.value = notifTime;
+  document.getElementById('modal-overlay').style.display = 'flex';
+}
+function closeSettings() { document.getElementById('modal-overlay').style.display='none'; }
+function toggleNotif() {
+  notifEnabled=!notifEnabled;
+  const t=document.getElementById('notif-track');
+  if(t) t.className='toggle-track'+(notifEnabled?' on':'');
+  const p=document.getElementById('time-picker');
+  if(p) p.style.display=notifEnabled?'block':'none';
+  if(notifEnabled) askNotifPerm();
+}
+function askNotifPerm() {
+  if(!('Notification' in window)){ showNotifMsg('⚠️ Non supporté sur ce navigateur.','#f97316'); return; }
+  if(Notification.permission==='granted'){ scheduleNotif(); showNotifMsg('✅ Rappel actif à '+notifTime,'#22c55e'); }
+  else if(Notification.permission!=='denied'){
+    Notification.requestPermission().then(p=>{
+      if(p==='granted'){ scheduleNotif(); showNotifMsg('✅ Rappels activés','#22c55e'); }
+      else{ notifEnabled=false; document.getElementById('notif-track').className='toggle-track'; document.getElementById('time-picker').style.display='none'; showNotifMsg('❌ Permission refusée.','#e0314b'); }
+    });
+  } else showNotifMsg('❌ Notifications bloquées dans les réglages.','#e0314b');
+}
+function saveAlertTime() {
+  const ni=document.getElementById('notif-time');
+  if(ni) notifTime=ni.value;
+  if(notifEnabled){ scheduleNotif(); showNotifMsg('✅ Rappel à '+notifTime,'#22c55e'); }
+}
+function scheduleNotif() {
+  if(notifTimer) clearInterval(notifTimer);
+  notifTimer=setInterval(()=>{
+    const n=new Date(), hm=n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0');
+    if(hm===notifTime&&Notification.permission==='granted')
+      new Notification('🎙️ ShadowTalk',{body:"C'est l'heure ! 15 min pour avancer. 🔥 Streak en jeu !"});
+  },60000);
+}
+function showNotifMsg(msg,color){ const e=document.getElementById('notif-status'); if(e){ e.textContent=msg; e.style.color=color; e.style.display='block'; } }
+
+// Tooltip dismiss on outside click
+document.addEventListener('click', e=>{ if(!e.target.closest('.word-key')) document.getElementById('tooltip')?.classList.remove('show'); });
+
+// Clock update
+function updateClock() {
+  const el=document.getElementById('phone-statusbar-time');
+  if(el){ const n=new Date(); el.textContent=n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0'); }
+}
+updateClock(); setInterval(updateClock,10000);
+
+// ── INIT ──
+document.querySelectorAll('.screen').forEach(s=>{ s.style.display='none'; s.classList.remove('active'); });
+document.getElementById('bottom-nav').style.display='none';
+// Restore saved ElevenLabs key
+try { const k = localStorage.getItem('el_api_key'); if(k) elApiKey = k; } catch(_){}
+showScreen('splash');
+</script>
+</div><!-- /#phone-shell -->
+</body>
+</html>
