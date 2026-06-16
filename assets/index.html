@@ -1176,29 +1176,44 @@ const VOICE_DEFS = [
     wsPitch:0.72, wsRate:0.82 },
 ];
 
-// ── ElevenLabs config ──
-let elApiKey = '';       // set by user in settings
-let _audioCache = {};    // text → blob URL cache
+// ── Fish Audio (TTS principal — qualité #1) + fallbacks ──
+const FISH_API_KEY = '18096c9807304f11b55c03c614b8b75c';
+let elApiKey = '';       // ElevenLabs fallback (optionnel)
+let _audioCache = {};    // cache text → blob URL
 
-async function playWithElevenLabs(text, def) {
-  // Check cache first
-  const cacheKey = def.id + ':' + text;
-  if (_audioCache[cacheKey]) {
-    return _playBlob(_audioCache[cacheKey]);
-  }
+async function playWithFishAudio(text, def) {
+  const cacheKey = 'fish:' + def.id + ':' + text;
+  if (_audioCache[cacheKey]) { _playBlob(_audioCache[cacheKey]); return; }
   try {
-    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${def.elId}`, {
+    const res = await fetch('https://api.fish.audio/v1/tts', {
       method: 'POST',
       headers: {
-        'xi-api-key': elApiKey,
+        'Authorization': 'Bearer ' + FISH_API_KEY,
         'Content-Type': 'application/json',
-        'Accept': 'audio/mpeg',
+        'model': 's2-pro',
       },
-      body: JSON.stringify({
-        text,
-        model_id: 'eleven_multilingual_v2',
-        voice_settings: { stability: 0.5, similarity_boost: 0.75, style: 0.0 }
-      })
+      body: JSON.stringify({ text, chunk_length: 200, format: 'mp3', mp3_bitrate: 128, latency: 'normal' })
+    });
+    if (!res.ok) throw new Error('Fish ' + res.status);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    _audioCache[cacheKey] = url;
+    _playBlob(url);
+  } catch(e) {
+    console.warn('Fish Audio error, fallback ElevenLabs:', e);
+    playWithElevenLabs(text, def);
+  }
+}
+
+async function playWithElevenLabs(text, def) {
+  const cacheKey = 'el:' + def.id + ':' + text;
+  if (_audioCache[cacheKey]) { _playBlob(_audioCache[cacheKey]); return; }
+  try {
+    if (!elApiKey || elApiKey.length < 10) throw new Error('no EL key');
+    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${def.elId}`, {
+      method: 'POST',
+      headers: { 'xi-api-key': elApiKey, 'Content-Type': 'application/json', 'Accept': 'audio/mpeg' },
+      body: JSON.stringify({ text, model_id: 'eleven_multilingual_v2', voice_settings: { stability: 0.5, similarity_boost: 0.75, style: 0.0 } })
     });
     if (!res.ok) throw new Error('EL ' + res.status);
     const blob = await res.blob();
@@ -1206,7 +1221,7 @@ async function playWithElevenLabs(text, def) {
     _audioCache[cacheKey] = url;
     _playBlob(url);
   } catch(e) {
-    console.warn('ElevenLabs error, falling back to Web Speech:', e);
+    console.warn('ElevenLabs error, fallback Web Speech:', e);
     playWithWebSpeech(text, def);
   }
 }
@@ -1301,14 +1316,10 @@ function playWithWebSpeech(text, def) {
   }
 }
 
-// ── Main play function ──
+// ── Main play function — Fish Audio → ElevenLabs → Web Speech ──
 function playAudio(text) {
   const def = VOICE_DEFS.find(v => v.id === state.selectedVoice) || VOICE_DEFS[0];
-  if (elApiKey && elApiKey.length > 10) {
-    playWithElevenLabs(text, def);
-  } else {
-    playWithWebSpeech(text, def);
-  }
+  playWithFishAudio(text, def);
 }
 
 // ══════════════════════════════════
@@ -2353,12 +2364,6 @@ function updateSettingsProfile() {
   if (avatarEl) avatarEl.textContent = fbPlayerData.avatar || '';
 }
 
-function updateSettingsProfile() {
-  var n=document.getElementById("settings-player-name");
-  var a=document.getElementById("settings-player-avatar");
-  if(n) n.textContent=fbPlayerData.name||"—";
-  if(a) a.textContent=fbPlayerData.avatar||"";
-}
 function openSettings() {
   updateSettingsProfile();
   // Load saved API key
