@@ -2353,6 +2353,12 @@ function updateSettingsProfile() {
   if (avatarEl) avatarEl.textContent = fbPlayerData.avatar || '';
 }
 
+function updateSettingsProfile() {
+  var n=document.getElementById("settings-player-name");
+  var a=document.getElementById("settings-player-avatar");
+  if(n) n.textContent=fbPlayerData.name||"—";
+  if(a) a.textContent=fbPlayerData.avatar||"";
+}
 function openSettings() {
   updateSettingsProfile();
   // Load saved API key
