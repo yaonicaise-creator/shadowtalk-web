@@ -1181,7 +1181,7 @@ const FISH_API_KEY = '18096c9807304f11b55c03c614b8b75c';
 let elApiKey = '';       // ElevenLabs fallback (optionnel)
 let _audioCache = {};    // cache text → blob URL
 
-async function playWithFishAudio(text, def) {
+async function playWithWebSpeech(text, def) {
   const cacheKey = 'fish:' + def.id + ':' + text;
   if (_audioCache[cacheKey]) { _playBlob(_audioCache[cacheKey]); return; }
   try {
@@ -1319,7 +1319,7 @@ function playWithWebSpeech(text, def) {
 // ── Main play function — Fish Audio → ElevenLabs → Web Speech ──
 function playAudio(text) {
   const def = VOICE_DEFS.find(v => v.id === state.selectedVoice) || VOICE_DEFS[0];
-  playWithFishAudio(text, def);
+  playWithWebSpeech(text, def);
 }
 
 // ══════════════════════════════════
@@ -2437,4 +2437,5 @@ showScreen('splash');
 </div><!-- /#phone-shell -->
 </body>
 </html>
+
 
